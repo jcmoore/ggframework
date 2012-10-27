@@ -15,17 +15,27 @@ NS_HGE_BEGIN
 
 class HGERunLoop {
 	
+	static HGERunLoop *& sharedRunLoopReference();
+	
+protected:
+	
 	HGERunLoop();
 	~HGERunLoop();
 	
 public:
 	static HGERunLoop * sharedRunLoop();
 	
-	void startApp(const char * path);
+	virtual void startApp(const char * path);
 	
 	void setInterval(double interval);
 	
 	double getInterval();
+	
+	virtual void begin() = 0;
+	
+	virtual void update() = 0;
+	
+	virtual void present() = 0;
 };
 
 NS_HGE_END

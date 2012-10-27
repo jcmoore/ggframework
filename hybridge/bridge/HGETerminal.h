@@ -17,10 +17,11 @@ class HGEInterface;
 
 class HGETerminal {
 	
+protected:
+	
 	HGETerminal();
 	~HGETerminal();
 	
-protected:
 	HGEInterface * interface;
 	
 public:
