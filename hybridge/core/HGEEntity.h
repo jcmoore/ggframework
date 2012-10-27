@@ -29,11 +29,15 @@ public:
 	HGEEntity(id_hge unique);
 	virtual ~HGEEntity();
 	
-	static JSONValue& TaskConstruction() { return HGEJSON::Null(); }
-	static bool IsTaskConstruction(JSONValue& task) { return task.IsNull(); }
+	/**
+	 using JSON as input, destroy the entity
+	 */
+	virtual bool destroyJSON(JSONValue& json, HGEToolbox * toolbox) = 0;
 	
-	static JSONValue& TaskDestruction() { return HGEJSON::Undefined(); }
-	static bool IsTaskDestruction(JSONValue& task) { return task.IsUndefined(); }
+	/**
+	 using JSON as input, create the entity
+	 */
+	virtual bool createJSON(JSONValue& json, HGEToolbox * toolbox) = 0;
 	
 	/**
 	 using JSON as input, take some action

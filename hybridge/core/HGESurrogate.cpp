@@ -20,20 +20,28 @@ HGESurrogate::~HGESurrogate() {
 	
 }
 
-bool HGESurrogate::enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox)
+bool HGESurrogate::destroyJSON(JSONValue& json, HGEToolbox * toolbox)
 {
-	if (HGEEntity::IsTaskDestruction(task)) {
-		
-	} else if (HGEEntity::IsTaskConstruction(task)) {
-		if (json.IsObject()) {
-			JSONValue& substitution = json[JSON_SUBSTITUTION_DECLARATION];
-			if (!substitution.IsUndefined())
-			{
-				this->carry(substitution, toolbox);
-			}
+	return !0;
+}
+
+bool HGESurrogate::createJSON(JSONValue& json, HGEToolbox * toolbox)
+{
+	if (json.IsObject()) {
+		JSONValue& substitution = json[JSON_SUBSTITUTION_DECLARATION];
+		if (!substitution.IsUndefined())
+		{
+			this->carry(substitution, toolbox);
+			
+			return !0;
 		}
 	}
 	
+	return 0;
+}
+
+bool HGESurrogate::enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox)
+{
 	return !0;
 }
 

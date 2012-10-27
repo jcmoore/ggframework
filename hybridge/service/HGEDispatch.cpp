@@ -69,7 +69,7 @@ bool HGEDispatch::consumeJSON(JSONValue& json, HGEToolbox * toolbox) {
 	if (entity) {
 		if (taskString &&
 			taskString[0] == '~') {
-			bool result = entity->enactJSON(HGEEntity::TaskDestruction(), json, toolbox);
+			bool result = entity->destroyJSON(json, toolbox);
 			delete entity;
 			entity = 0;
 			HGEDispatch::EntityRoster().erase(unique);
@@ -82,7 +82,7 @@ bool HGEDispatch::consumeJSON(JSONValue& json, HGEToolbox * toolbox) {
 		entity = this->generateEntity(taskString, unique, json, toolbox);
 		if (entity)
 		{
-			return entity->enactJSON(HGEEntity::TaskConstruction(), json, toolbox);
+			return entity->createJSON(json, toolbox);
 		}
 	} else {
 		HGEDispatch::EntityRoster().erase(unique);
