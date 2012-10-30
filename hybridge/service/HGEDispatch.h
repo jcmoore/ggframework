@@ -38,7 +38,7 @@ public:
 	virtual bool initService(uint32_t argc, const char* argn[], const char* argv[], HGEToolbox * toolbox);
 protected:
 	/**
-	 dispatch: ({'hgeid':idNumber, 'task':taskJSON, ...}) passes taskJSON to the entity with id idNumber,
+	 hge@: ({'hgeid':idNumber, 'task':taskJSON, ...}) passes taskJSON to the entity with id idNumber,
 	 *	if no entity exists with the desired id and the taskJSON is JSON String, a new entity is generated
 	 *	with the idNumber using the generator specified by the taskJSON String,
 	 *	if the taskJSON is a JSON String prefixed with a '~' (tilde), any entity found with the id idNumber
@@ -84,7 +84,7 @@ public:
 	/**
 	 get the entity with the specified id
 	 */
-	static HGEEntity * EntityWithId(id_hge hgeuuid); // a little worried about thread safety...
+	static HGEEntity * EntityWithId(id_hge domain, id_hge hgeuuid); // a little worried about thread safety...
 	
 	/**
 	 set a generator to be used for a specific entity type

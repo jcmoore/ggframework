@@ -20,6 +20,7 @@
 NS_HGE_BEGIN
 
 //class HGEWorker;
+class HGELogger;
 class HGEDispatch;
 typedef std::list < HGEWorker * > HGEWorkerList;
 typedef std::map< std::string, HGEWorker * > HGEWorkerMap;
@@ -108,6 +109,7 @@ private:
 	
 	void * client;
 	
+	HGELogger * logger;
 	HGEDispatch * dispatcher;
 	
 	/**

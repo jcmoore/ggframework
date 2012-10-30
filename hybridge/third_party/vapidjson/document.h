@@ -390,7 +390,7 @@ int z = a[0u].GetInt();				// This works too.
 			return UndefinedValue();
 		}
 		VAPIDJSON_ASSERT(data_.a.elements);
-		for (ValueIterator i = data_.a.elements->begin(); i != End(); i++) {
+		for (ValueIterator i = Begin(); i != End(); i++) {
 			if (index-- == 0) {
 				return *(*i);
 			}
@@ -497,6 +497,34 @@ int z = a[0u].GetInt();				// This works too.
 		data_.a.elements->pop_back();
 		data_.a.size--;
 		return *this;
+	}
+	
+#define VAPIDJSON_GET_ELEMENTS(value, ...) (value).GetElementsUnsafe(__VA_ARGS__, 0)
+	SizeType GetElementsUnsafe ( GenericValue const ** first, ...) const
+	{
+		SizeType count = 0;
+		
+		VAPIDJSON_ASSERT(IsArray());
+		
+		ValueIterator iter = Begin();
+		
+		GenericValue const ** e;
+		va_list vl;
+		
+		e = first;
+		
+		va_start(vl,first);
+		
+		while (e && iter != End()) {
+			*e = (*iter);
+			iter++;
+			count++;
+			e = va_arg(vl, GenericValue const **);
+		}
+		
+		va_end(vl);
+		
+		return count;
 	}
 	
 	//@}

@@ -8,6 +8,7 @@
 
 #include "service/HGEInterface.h"
 
+#include "service/HGELogger.h"
 #include "service/HGEDispatch.h"
 
 #define VAPIDJSON_USE_PARSE_INSITU		0
@@ -16,6 +17,7 @@ NS_HGE_BEGIN
 
 HGEInterface::HGEInterface(void * c)
 : client(c)
+, logger(0)
 , dispatcher(0)
 , workers()
 , capacity(0)
@@ -39,13 +41,14 @@ HGEInterface::~HGEInterface() {
 		HGEWorker * worker = (*iter).second;
 		delete worker;
 	}
-	delete this->dispatcher;  this->dispatcher = 0;
+	HGEDeleteNull(this->logger);
+	HGEDeleteNull(this->dispatcher);
 	{
 		HGEMutex::Lock lock(this->mutex);
-		delete this->mainQueue;  this->mainQueue = 0;
-		delete this->offQueue;  this->offQueue = 0;
+		HGEDeleteNull(this->mainQueue);
+		HGEDeleteNull(this->offQueue);
 	}
-	free(this->buffer);  this->buffer = 0;
+	HGEFreeNull(this->buffer);
 	this->capacity = 0;
 }
 
@@ -71,9 +74,11 @@ bool HGEInterface::initService(uint32_t argc/* argc */,
 							  HGEToolbox * toolbox) {
 	
 	// assign the required workers
+	this->logger = new HGELogger();
 	this->dispatcher = new HGEDispatch();
 	
 	this->workers[this->aliasName()] = this;
+	this->workers[this->logger->aliasName()] = this->logger;
 	this->workers[this->dispatcher->aliasName()] = this->dispatcher;
 	
 	HGEToolbox box = this->getToolbox();
@@ -108,7 +113,7 @@ bool HGEInterface::initService(uint32_t argc/* argc */,
 	// clear the worker list
 	HGEInterface::WorkerQueue().clear();
 	
-	return true;
+	return !0;
 }
 
 void HGEInterface::flushMessage(JSONBuffer& stream) {
@@ -193,11 +198,11 @@ void HGEInterface::moveJSON(JSONValue& json) {
 		
 		const JSONValue::Ch * str = key.c_str();
 		
-		// shortcut for dispatch provided services
-		if (!str || !str[0]) {
-			this->dispatcher->receiveJSON(json, &box);
-			continue;
-		}
+		//// shortcut for dispatch provided services
+		//if (!str || !str[0]) {
+		//	this->dispatcher->receiveJSON(json, &box);
+		//	continue;
+		//}
 		
 		// shortcut for interface provided services
 		if (memcmp(name.data(), str, range * sizeof(JSONKey)) == 0) {
@@ -222,13 +227,13 @@ void HGEInterface::moveJSON(JSONValue& json) {
 void HGEInterface::bounceJSON(JSONValue& json, HGEWorker * worker, HGEToolbox * toolbox) {
 	
 	HGEAssertC(0, "service was unhandled by worker -- defaulting to dispatcher (which seems like bad form...)");
-	if (worker != this->dispatcher) {
-		this->dispatcher->receiveJSON(json, toolbox);
-	}
+	//if (worker != this->dispatcher) {
+	//	this->dispatcher->receiveJSON(json, toolbox);
+	//}
 }
 
 bool HGEInterface::consumeJSON(JSONValue& json, HGEToolbox * toolbox) {
-	return false;
+	return 0;
 }
 
 void HGEInterface::produceJSON(JSONValue& json, bool copy) {

@@ -10,6 +10,7 @@
 #define __HGEKIND_H__
 
 #include "core/HGEID.h"
+#include "dev/HGEMacros.h"
 
 // add kind component -- base-kind
 #define HGEClassifyBaseKind(kind)		\
@@ -21,7 +22,7 @@ virtual bool hgekindof(kind_hge k) { return k == this->hgekind(); }
 #define HGEClassifyKind(subkind, superkind)		\
 public: \
 virtual kind_hge hgekind() { return HGEKind<subkind>(); } \
-virtual bool hgekindof(kind_hge k) { return k == this->hgekind() || subkind::hgekindof(k); }
+virtual bool hgekindof(kind_hge k) { return k == subkind::hgekind() || superkind::hgekindof(k); }
 
 NS_HGE_BEGIN
 
@@ -54,7 +55,11 @@ struct HGEKind {
 	
 	HGEKind() {};
 	
-	operator kind_hge () { static kind_hge instance = HGEKindId::uniqueKind(); return instance; }
+	operator kind_hge () {
+		static kind_hge instance = HGEKindId::uniqueKind();
+		
+		return instance;
+	}
 };
 
 /**

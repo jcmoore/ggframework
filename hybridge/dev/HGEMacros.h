@@ -160,6 +160,8 @@ static inline void hge_valarm_objc(const void * value, const char * expr, NSStri
 
 #endif
 
+#define HGEFree(x)							free(x)
+#define HGEFreeNull(x)						HGEFree(x);  x = 0
 
 
 

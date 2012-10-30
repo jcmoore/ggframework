@@ -20,29 +20,45 @@ HGESurrogate::~HGESurrogate() {
 	
 }
 
-bool HGESurrogate::destroyJSON(JSONValue& json, HGEToolbox * toolbox)
+bool HGESurrogate::destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox)
 {
-	return !0;
-}
-
-bool HGESurrogate::createJSON(JSONValue& json, HGEToolbox * toolbox)
-{
-	if (json.IsObject()) {
-		JSONValue& substitution = json[JSON_SUBSTITUTION_DECLARATION];
-		if (!substitution.IsUndefined())
-		{
-			this->carry(substitution, toolbox);
-			
-			return !0;
-		}
+	bool didDestroy = 0;
+	
+	if (firstResponder)
+	{
+		didDestroy = !0;
+		firstResponder = 0;
 	}
 	
-	return 0;
+	return didDestroy;
+}
+
+bool HGESurrogate::createJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox)
+{
+	bool didCreate = 0;
+	
+	if (json.IsObject()) {
+		if (firstResponder) {
+			JSONValue& substitution = json[JSON_SUBSTITUTION_DECLARATION];
+			if (!substitution.IsUndefined())
+			{
+				this->carry(substitution, toolbox);
+				didCreate = !0;
+				firstResponder = 0;
+			}
+		}
+		
+		
+	}
+	
+	return didCreate;
 }
 
 bool HGESurrogate::enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox)
 {
-	return !0;
+	bool didEnact = 0;
+	
+	return didEnact;
 }
 
 NS_HGE_END

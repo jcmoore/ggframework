@@ -10,10 +10,6 @@
 
 #include "service/HGEInterface.h"
 
-#include "core/HGERef.h"
-
-#include "dev/HGEKeycode.h"
-
 NS_HGE_BEGIN
 
 void HGEDispatch::AssignGenerator(const char* type, HGEGenerator gen) {
@@ -45,19 +41,19 @@ void HGEDispatch::tidyJSON (JSONValue& task, HGEToolbox * toolbox) {
 }
 
 bool HGEDispatch::initService(uint32_t argc, const char* argn[], const char* argv[], HGEToolbox * toolbox) {
-	return true;
+	return !0;
 }
 
 bool HGEDispatch::consumeJSON(JSONValue& json, HGEToolbox * toolbox) {
 	
 	JSONValue& hgeuuid = json[HGE_KEYTEXT_UUID];
 	if (!hgeuuid.IsUint64()) {
-		return false;
+		return 0;
 	}
 	
 	JSONValue& task = json[HGE_KEYTEXT_TASK];
 	if (task.IsUndefined()) {
-		return false;
+		return 0;
 	}
 	
 	uint64_t unique = hgeuuid.GetUint64();
@@ -69,7 +65,7 @@ bool HGEDispatch::consumeJSON(JSONValue& json, HGEToolbox * toolbox) {
 	if (entity) {
 		if (taskString &&
 			taskString[0] == '~') {
-			bool result = entity->destroyJSON(json, toolbox);
+			bool result = entity->destroyJSON(json, true, toolbox);
 			delete entity;
 			entity = 0;
 			HGEDispatch::EntityRoster().erase(unique);
@@ -82,14 +78,14 @@ bool HGEDispatch::consumeJSON(JSONValue& json, HGEToolbox * toolbox) {
 		entity = this->generateEntity(taskString, unique, json, toolbox);
 		if (entity)
 		{
-			return entity->createJSON(json, toolbox);
+			return entity->createJSON(json, true, toolbox);
 		}
 	} else {
 		HGEDispatch::EntityRoster().erase(unique);
-		return true;
+		return !0;
 	}
 	
-	return false;
+	return 0;
 }
 
 HGEEntity * HGEDispatch::generateEntity(const char* type, id_hge unique, JSONValue& json, HGEToolbox * toolbox) {
@@ -97,12 +93,14 @@ HGEEntity * HGEDispatch::generateEntity(const char* type, id_hge unique, JSONVal
 	HGEGeneratorMap::iterator iter = HGEDispatch::GeneratorRoster().find(type);
 	
 	if (iter == HGEDispatch::GeneratorRoster().end()) {
+		HGEAssertC(0, "no generator found for type: %s", type);
 		return 0;
 	}
 	
 	HGEGenerator & gen = (*iter).second;
 	
 	if (!gen) {
+		HGEAssertC(0, "malformed generator found for type: %s", type);
 		return 0;
 	}
 	
@@ -127,7 +125,7 @@ HGEEntity * HGEDispatch::generateEntity(const char* type, id_hge unique, JSONVal
 	return entity;
 }
 
-HGEEntity * HGEDispatch::EntityWithId(id_hge hgeuuid) {
+HGEEntity * HGEDispatch::EntityWithId(id_hge domain, id_hge hgeuuid) {
 	
 	HGEEntityMap::iterator iter = HGEDispatch::EntityRoster().find(hgeuuid);
 	

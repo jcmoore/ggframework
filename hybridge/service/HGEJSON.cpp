@@ -250,7 +250,7 @@ HGEJSONRef& HGEJSONRef::subDeref(Value * pointer) {
 }
 
 HGEJSONRef& HGEJSONRef::subDeref(id_hge hgeuuid) {
-	HGEEntity * entity = HGEDispatch::EntityWithId(hgeuuid);
+	HGEEntity * entity = HGEDispatch::EntityWithId(0, hgeuuid);
 	if (entity &&
 		entity->HGEModel::hgekindof(HGEKind<HGESurrogate>())) {
 		HGESurrogate * target = (HGESurrogate *)entity;

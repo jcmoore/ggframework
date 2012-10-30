@@ -26,12 +26,12 @@ public:
 	/**
 	 destruction: () none
 	 */
-	virtual bool destroyJSON(JSONValue& json, HGEToolbox * toolbox);
+	virtual bool destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox);
 	
 	/**
 	 construction: ({'$$':substituteJSON, ...}) carry part of the provided json and act as a substitute for it through HGEJSONRef fusions
 	 */
-	virtual bool createJSON(JSONValue& json, HGEToolbox * toolbox);
+	virtual bool createJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox);
 	
 	/**
 	 */

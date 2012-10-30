@@ -19,6 +19,8 @@ NS_HGE_BEGIN
 
 class HGEToolbox;
 
+typedef int update_priority;
+
 /**
  base class of all uniquely identifiable instance-based sub-services that can turn JSON into actions
  */
@@ -32,17 +34,22 @@ public:
 	/**
 	 using JSON as input, destroy the entity
 	 */
-	virtual bool destroyJSON(JSONValue& json, HGEToolbox * toolbox) = 0;
+	virtual bool destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox) = 0;
 	
 	/**
 	 using JSON as input, create the entity
 	 */
-	virtual bool createJSON(JSONValue& json, HGEToolbox * toolbox) = 0;
+	virtual bool createJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox) = 0;
 	
 	/**
 	 using JSON as input, take some action
 	 */
 	virtual bool enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox) = 0;
+	
+	/**
+	 using JSON as input, take some action
+	 */
+	virtual void autoCorrect(update_priority phase) {};
 	
 	/**
 	 get the uuid for the entity
