@@ -110,9 +110,12 @@ void HGETerminal::execute() {
 		offQueue->clear();
 		
 		queue = offQueue;
-		platformTerminal->offQueue = mainQueue;
-		platformTerminal->mainQueue = queue;
+		offQueue = mainQueue;
+		mainQueue = queue;
 		queue = offQueue;
+		
+		platformTerminal->offQueue = offQueue;
+		platformTerminal->mainQueue = mainQueue;
 	}
 	
 	for (HGEPlatformTerminal::MessageQueue::iterator iter = queue->begin();
