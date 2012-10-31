@@ -74,16 +74,16 @@ protected:
 	
 public:
 	/**
-	 guard calls to deployJSON() from having to handle non-JSON-Object values -- 
+	 guard calls to produceJSON() from having to handle non-JSON-Object values -- 
 	 typically this should only be done by HGEWorkers and HGEEntities
 	 */
-	void produceJSON(JSONValue& json, bool copy = !0);
+	void deployJSON(JSONValue& json, bool copy = !0);
 	
 private:
 	/**
 	 add json service responses to be flushed to the client
 	 */
-	void deployJSON(JSONValue& json, bool copy);
+	void produceJSON(JSONValue& json, bool copy);
 	
 public:
 	

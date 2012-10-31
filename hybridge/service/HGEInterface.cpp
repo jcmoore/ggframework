@@ -77,7 +77,6 @@ bool HGEInterface::initService(uint32_t argc/* argc */,
 	this->logger = new HGELogger();
 	this->dispatcher = new HGEDispatch();
 	
-	this->workers[this->aliasName()] = this;
 	this->workers[this->logger->aliasName()] = this->logger;
 	this->workers[this->dispatcher->aliasName()] = this->dispatcher;
 	
@@ -184,44 +183,9 @@ void HGEInterface::moveJSON(JSONValue& json) {
 		return;
 	}
 	
-	std::string& name = this->aliasName();
-	
-	size_t range = name.length();
-	
 	HGEToolbox box = this->getToolbox();
 	
-	for (JSONValue::MemberIterator iter = json.MemberBegin();
-		 iter != json.MemberEnd(); iter++) {
-		
-		JSONText const& key = iter->first;
-		JSONValue& value = *iter->second;
-		
-		const JSONValue::Ch * str = key.c_str();
-		
-		//// shortcut for dispatch provided services
-		//if (!str || !str[0]) {
-		//	this->dispatcher->receiveJSON(json, &box);
-		//	continue;
-		//}
-		
-		// shortcut for interface provided services
-		if (memcmp(name.data(), str, range * sizeof(JSONKey)) == 0) {
-			this->receiveJSON(value, &box);
-			continue;
-		}
-		
-		HGEWorkerMap::iterator jter = this->workers.find(str);
-		
-		if (jter != this->workers.end()) {
-			HGEWorker * part = (*jter).second;
-			if (part) {
-				part->receiveJSON(value, &box);
-				continue;
-			}
-		}
-		
-		HGEAssertC(0, "unhandled service request");
-	}
+	this->consumeJSON(json, &box);
 }
 
 void HGEInterface::bounceJSON(JSONValue& json, HGEWorker * worker, HGEToolbox * toolbox) {
@@ -233,23 +197,48 @@ void HGEInterface::bounceJSON(JSONValue& json, HGEWorker * worker, HGEToolbox * 
 }
 
 bool HGEInterface::consumeJSON(JSONValue& json, HGEToolbox * toolbox) {
-	return 0;
+	
+	bool result = !0;
+	
+	for (JSONValue::MemberIterator iter = json.MemberBegin();
+		 iter != json.MemberEnd(); iter++) {
+		
+		JSONText const& key = iter->first;
+		JSONValue& value = *iter->second;
+		
+		const JSONValue::Ch * str = key.c_str();
+		
+		HGEWorkerMap::iterator jter = this->workers.find(str);
+		
+		if (jter != this->workers.end()) {
+			HGEWorker * part = (*jter).second;
+			if (part) {
+				result = part->receiveJSON(value, toolbox) && result;
+				continue;
+			}
+		}
+		
+		result = 0;
+		HGEAssertC(0, "unhandled service request");
+	}
+	
+	return result;
 }
 
-void HGEInterface::produceJSON(JSONValue& json, bool copy) {
+void HGEInterface::deployJSON(JSONValue& json, bool copy) {
 	
 	if (json.IsObject()) {
-		this->deployJSON(json, copy);
+		this->produceJSON(json, copy);
 	} else if (json.IsArray()) {
 		for (JSONValue::ValueIterator iter = json.Begin();
 			 iter != json.End(); iter++) {
 			JSONValue& value = *(*iter);
-			this->deployJSON(value, copy);
+			this->produceJSON(value, copy);
 		}
 	}
 }
 
-void HGEInterface::deployJSON(JSONValue& json, bool copy) {
+void HGEInterface::produceJSON(JSONValue& json, bool copy) {
 	
 	if (!json.IsObject()) {
 		HGEAssertC(0, "json argument must be a JSON Object");
