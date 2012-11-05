@@ -6,31 +6,35 @@
 //  Copyright (c) 2012 Starduu. All rights reserved.
 //
 
-#ifndef __HGEHANDLER_H__
-#define __HGEHANDLER_H__
+#ifndef __HGEWORKER_H__
+#define __HGEWORKER_H__
 
 #include "dev/HGEPlatformMacros.h"
 
-#include "service/HGEToolbox.h"
 #include "service/HGEJSON.h"
+
+#include "core/HGEEntity.h"
 
 #include <string>
 
 NS_HGE_BEGIN
 
+class HGESuperior;
+
 /**
  abstract base object capable of fulfilling a hybrid service request
  */
-class HGEWorker {
+class HGEWorker : public
+HGECircuit <
+HGEImplementer	<
+HGEWorker, HGEEntity > > {
 	
 public:
-	HGEWorker() {};
+	HGEWorker(const char * a)
+	: alias(a),
+	superior(0) {
+	};
 	virtual ~HGEWorker() {};
-	
-	/**
-	 prepare to fulfill service requests
-	 */
-	virtual bool initService(uint32_t argc, const char* argn[], const char* argv[], HGEToolbox * toolbox) = 0;
 	
 	/**
 	 service requests are expected to be JSON Objects for consumption
@@ -38,18 +42,57 @@ public:
 	 of multiple sequential requests
 	 this public interface handles requests whether Array or Object
 	 */
-	virtual bool receiveJSON(JSONValue& json, HGEToolbox * toolbox);
+	bool consumeJSON(JSONValue& json);
+	
 protected:
 	/**
 	 fulfill a service request specified by the provided JSON
 	 */
-	virtual bool consumeJSON(JSONValue& json, HGEToolbox * toolbox) = 0;
+	virtual bool digestJSON(JSONValue& json) = 0;
 	
 public:
+	
 	/**
-	 the name of the service the worker can fulfill requests for
+	 furnish service responses to superior
 	 */
-	virtual std::string& aliasName() = 0;
+	virtual bool produceJSON(JSONValue& json, bool purify = 0);
+	
+	/**
+	 report any pending work that has been completed but not yet furnished
+	 */
+	virtual bool reportJSON(JSONValue& result);
+	
+private:
+	
+	std::string alias;
+	
+	HGESuperior * superior;
+	
+public:
+	
+	/**
+	 attribute a response according to alias
+	 */
+	void markJSON(JSONValue& result, JSONValue& json, bool purify);
+	
+	/**
+	 get the name of the service the worker can fulfill requests for
+	 */
+	std::string const& getAlias() { return this->alias; };
+	
+	/**
+	 get the superior of the worker
+	 */
+	HGESuperior * getSuperior() { return this->superior; }
+	
+private:
+	
+	/**
+	 set the superior of the worker (only to be invoked by the superior itself)
+	 */
+	void setSuperior(HGESuperior * s) { this->superior = s; }
+	
+	friend class HGESuperior;
 };
 
 NS_HGE_END

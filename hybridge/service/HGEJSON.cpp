@@ -8,23 +8,23 @@
 
 #include "service/HGEJSON.h"
 
-#include "service/HGEInterface.h"
-#include "service/HGEDispatch.h"
+#include "service/HGEAPI.h"
+#include "service/HGERouter.h"
 
 #include "core/HGESurrogate.h"
 
 NS_HGE_BEGIN
 
-void jsonlog(JSONValue& json, HGEToolbox * toolbox) {
+void jsonlog(JSONValue& json) {
 #if HGE_DEBUG
 	JSONBuffer stream;
 	JSONWriter output(stream);
 	json.Accept(output);
-	HGEToolboxLog(toolbox, stream.GetString());
+	HGEPrintln("%s", stream.GetString());
 #endif
 }
 
-void jsonlogr(HGEJSONRef& json, bool replace, HGEToolbox * toolbox) {
+void jsonlogr(HGEJSONRef& json, bool replace) {
 #if HGE_DEBUG
 	JSONBuffer stream;
 	JSONWriter output(stream);
@@ -33,16 +33,16 @@ void jsonlogr(HGEJSONRef& json, bool replace, HGEToolbox * toolbox) {
 	} else {
 		json.reinterpret(output);
 	}
-	HGEToolboxLog(toolbox, stream.GetString());
+	HGEPrintln("%s", stream.GetString());
 #endif
 }
 
-void HGEJSONRef::log(HGEToolbox * toolbox) {
+void HGEJSONRef::log() {
 #if HGE_DEBUG
 	if (this->unset()) {
-		return jsonlog(Undefined(), 0);
+		return jsonlog(Undefined());
 	} else {
-		return jsonlog(*this->stored.value, 0);
+		return jsonlog(*this->stored.value);
 	}
 #endif
 }
@@ -137,7 +137,7 @@ HGEJSONRef HGEJSONRef::subShortcut(HGEJSONRef& substitute) {
 					substitute = parent.subDeref(hgeuuid);
 					
 					if (substitute.unset()) {
-						HGEAssertC(0, "failed to dereference %s: %li", HGE_KEYTEXT_UUID, hgeuuid);
+						HGEAssertC(0, "failed to dereference %s: %li", HGE_KEYTEXT_PORT_NUMBER, hgeuuid);
 						return HGEJSONRef::UndefinedRef();
 					}
 					
@@ -175,7 +175,7 @@ HGEJSONRef HGEJSONRef::subShortcut(HGEJSONRef& substitute) {
 					substitute = parent.subDeref(hgeuuid);
 					
 					if (substitute.unset()) {
-						HGEAssertC(0, "failed to dereference %s: %li", HGE_KEYTEXT_UUID, hgeuuid)
+						HGEAssertC(0, "failed to dereference %s: %li", HGE_KEYTEXT_PORT_NUMBER, hgeuuid)
 						return HGEJSONRef::UndefinedRef();
 					}
 					
@@ -217,7 +217,7 @@ HGEJSONRef HGEJSONRef::subShortcut(HGEJSONRef& substitute) {
 							substitute = parent.subDeref(hgeuuid);
 							
 							if (substitute.unset()) {
-								HGEAssertC(0, "failed to dereference %s: %li", HGE_KEYTEXT_UUID, hgeuuid)
+								HGEAssertC(0, "failed to dereference %s: %li", HGE_KEYTEXT_PORT_NUMBER, hgeuuid)
 								return HGEJSONRef::UndefinedRef();
 							}
 							
@@ -250,11 +250,12 @@ HGEJSONRef& HGEJSONRef::subDeref(Value * pointer) {
 }
 
 HGEJSONRef& HGEJSONRef::subDeref(id_hge hgeuuid) {
-	HGEEntity * entity = HGEDispatch::EntityWithId(0, hgeuuid);
+	HGEAssertC(0, "this is no longer implemented correctly...");
+	HGEEntity * entity = 0; //HGEDispatch::EntityWithId(0, hgeuuid);
+	HGEEntity * surrogate = 0;
 	if (entity &&
-		entity->HGEModel::hgekindof(HGEKind<HGESurrogate>())) {
-		HGESurrogate * target = (HGESurrogate *)entity;
-		return target->contents();
+		entity->knownKind(HGEKind<HGESurrogate>(), &surrogate)) {
+		return ((HGESurrogate *)surrogate)->contents();
 	}
 	
 	return UndefinedRef();
@@ -400,7 +401,7 @@ HGEJSONRef::Value& HGEJSONRef::subKey(Value * pointer, const Key* key, bool anyk
 			return HGEJSONRef::Undefined();
 		} else if (pointer->IsNumber()) { // this is an escape sequence
 			HGEAssertC(pointer->GetUint64() == 0,
-					   "what was expected to be an escape sequence was found to have non-zero %s: %li", HGE_KEYTEXT_UUID, pointer->GetUint64());
+					   "what was expected to be an escape sequence was found to have non-zero %s: %li", HGE_KEYTEXT_PORT_NUMBER, pointer->GetUint64());
 			pointer = &this->subEscape();
 			if (pointer->IsObject()) {
 				size_t range = strlen(key);
@@ -523,7 +524,7 @@ HGEJSONRef::Value& HGEJSONRef::subIndex(Value * pointer, Index index, Index& cou
 			return HGEJSONRef::Undefined();
 		} else if (pointer->IsNumber()) { // this is an escape sequence
 			HGEAssertC(pointer->GetUint64() == 0,
-					   "what was expected to be an escape sequence was found to have non-zero %s: %li", HGE_KEYTEXT_UUID, pointer->GetUint64());
+					   "what was expected to be an escape sequence was found to have non-zero %s: %li", HGE_KEYTEXT_PORT_NUMBER, pointer->GetUint64());
 			pointer = &this->subEscape();
 			if (pointer->IsArray()) {
 				Index size = pointer->Size();
@@ -538,7 +539,7 @@ HGEJSONRef::Value& HGEJSONRef::subIndex(Value * pointer, Index index, Index& cou
 							return *pointer;
 						}
 					}
-					HGEAssert(0, "size inconsistency");
+					HGEAssertC(0, "size inconsistency");
 					return HGEJSONRef::Undefined();
 				}
 				
@@ -567,18 +568,14 @@ HGEJSON::HGEJSON()
 	
 }
 
-HGEJSON::HGEJSON(JSONValue& json, HGEToolbox * toolbox)
+HGEJSON::HGEJSON(JSONValue& json)
 : HGEJSONRef(0)
 {
-	this->mimic(json, toolbox);
+	this->mimic(json);
 }
 
 HGEJSON::~HGEJSON() {
 	delete this->stored.value;  this->stored.value = 0;
-}
-
-HGEJSON& HGEJSON::mimic(JSONValue& json, HGEToolbox * toolbox) {
-	return this->mimic(json);
 }
 
 HGEJSON& HGEJSON::mimic(JSONValue& json) {

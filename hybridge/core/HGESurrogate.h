@@ -9,33 +9,32 @@
 #ifndef __HGESURROGATE_H__
 #define __HGESURROGATE_H__
 
-#include "core/HGECarrier.h"
+#include "core/HGEPreserve.h"
 
 NS_HGE_BEGIN
 
 /**
  class acts as a reference for a json value, particularly used in the context of HGEJSONRef fusions
  */
-class HGESurrogate : public HGECarrier {
-	HGEClassifyKind(HGESurrogate, HGECarrier);
+class HGESurrogate : public HGEPreserve {
 	
 public:
-	HGESurrogate(id_hge unique);
+	HGESurrogate();
 	virtual ~HGESurrogate();
 	
 	/**
 	 destruction: () none
 	 */
-	virtual bool destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox);
+	virtual bool destroyJSON(JSONValue& json, bool firstResponder);
 	
 	/**
 	 construction: ({'$$':substituteJSON, ...}) carry part of the provided json and act as a substitute for it through HGEJSONRef fusions
 	 */
-	virtual bool createJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox);
+	virtual bool createJSON(JSONValue& json, bool firstResponder);
 	
 	/**
 	 */
-	virtual bool enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox);
+	virtual bool enactJSON(JSONValue& task, JSONValue& json, bool firstResponder);
 	
 	friend class HGEJSONRef;
 };

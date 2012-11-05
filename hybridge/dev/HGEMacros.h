@@ -84,7 +84,7 @@ static inline void hge_valarm(const unsigned int value, const char * expr, const
 //	left as a reference, did not work for nacl because AS
 //#pragma GCC diagnostic pop
 
-#define HGEAssert(x, ...)                   HGEAlarm((const unsigned int)(x), #x, __VA_ARGS__); HGEBreak(x)
+#define HGEAssertC(x, ...)                   HGEAlarm((const unsigned int)(x), #x, __VA_ARGS__); HGEBreak(x)
 #define HGEVAssert(x, f, va_l)              HGEVAlarm((const unsigned int)(x), #x, f, va_l); HGEBreak(x)
 
 #define HGENameFunction()                       (__FUNCTION__)
@@ -92,7 +92,9 @@ static inline void hge_valarm(const unsigned int value, const char * expr, const
 #define HGEAssertC(x, ...)                  if (!(x)) { HGEPrint("%s(): ", HGENameFunction()); } HGEAlarm((const unsigned int)(void *)(x), #x, __VA_ARGS__); HGEBreak(x)
 #define HGEVAssertC(x, f, va_l)             if (!(x)) { HGEPrint("%s(): ", HGENameFunction()); } HGEVAlarm((const unsigned int)(void *)(x), #x, f, va_l); HGEBreak(x)
 
-
+#define HGECAT_(a, b) a ## b
+#define HGECAT(a, b) HGECAT_(a, b)
+#define HGEAssertStatic(cond, ...) typedef int HGECAT(HGEAssertS, __LINE__)[(cond) ? 1 : -1]
 
 
 

@@ -18,6 +18,7 @@
 #include "dev/HGEKeycode.h"
 #include "util/HGEUtilString.h"
 #include "core/HGEID.h"
+#include "dev/HGEKeycode.h"
 
 
 #include <list>
@@ -26,8 +27,6 @@
 #define HGEJSONRef_SUB_CACHED	1
 
 NS_HGE_BEGIN
-
-class HGEToolbox;
 
 typedef vapidjson::Value JSONValue;
 typedef vapidjson::Document JSONDoc;
@@ -254,7 +253,7 @@ protected:
 						} else if (pointer->IsNumber()) {
 							HGEAssertC(pointer->GetUint64() == 0,
 									   "what was expected to be an escape sequence was found to have non-zero %s: %li",
-									   HGE_KEYTEXT_UUID,
+									   HGE_KEYTEXT_PORT_NUMBER,
 									   pointer->GetUint64());
 							pointer = &this->refStack.back().subEscape();
 							HGEAssertC(pointer->IsObject(), "plot hole found");
@@ -442,7 +441,7 @@ protected:
 						} else if (pointer->IsNumber()) {
 							HGEAssertC(pointer->GetUint64() == 0,
 									   "what was expected to be an escape sequence was found to have non-zero %s: %li",
-									   HGE_KEYTEXT_UUID,
+									   HGE_KEYTEXT_PORT_NUMBER,
 									   pointer->GetUint64());
 							pointer = &this->refStack.back().subEscape();
 							HGEAssertC(pointer->IsArray(), "plot hole found");
@@ -599,7 +598,7 @@ protected:
 							return result.hold(pointer);
 						}
 					}
-					HGEAssert(0, "size inconsistency");
+					HGEAssertC(0, "size inconsistency");
 					return UndefinedRef();
 				} else {
 					return UndefinedRef();
@@ -710,7 +709,7 @@ protected:
 								Kter kter = iter.asKter();
 								handler.StartObject();
 								while (!kter.terminated()) {
-									HGEAssert(kter.key(), "bad iterator");
+									HGEAssertC(kter.key(), "bad iterator");
 									JSONValue field(kter.key());
 									field.Accept(handler);
 									kter.value().Accept(handler);
@@ -737,7 +736,7 @@ protected:
 									Kter kter = iter.asKter();
 									handler.StartObject();
 									while (!kter.terminated()) {
-										HGEAssert(kter.key(), "bad iterator");
+										HGEAssertC(kter.key(), "bad iterator");
 										JSONValue field(kter.key());
 										field.Accept(handler);
 										kter.value().Accept(handler);
@@ -749,7 +748,7 @@ protected:
 							} else if (pointer->IsNumber()) { // this is an escape sequence
 								HGEAssertC(pointer->GetUint64() == 0,
 										   "what was expected to be an escape sequence was found to have non-zero %s: %li",
-										   HGE_KEYTEXT_UUID,
+										   HGE_KEYTEXT_PORT_NUMBER,
 										   pointer->GetUint64());
 								pointer = &this->subEscape();
 								pointer->Accept(handler);
@@ -791,7 +790,7 @@ public:
 #if HGE_DEBUG
 	__attribute__ ((used))
 #endif
-	void log(HGEToolbox * toolbox);
+	void log();
 };
 
 struct HGEJSON : public HGEJSONRef {
@@ -801,39 +800,37 @@ struct HGEJSON : public HGEJSONRef {
 		return instance;
 	}
 	
-	HGEJSON(JSONValue& json, HGEToolbox * toolbox);
+	HGEJSON(JSONValue& json);
 	HGEJSON();
 	~HGEJSON();
 	
-	HGEJSON& mimic(JSONValue& json, HGEToolbox * toolbox);
+	HGEJSON& mimic(JSONValue& json);
 	
 protected:
-	
-	HGEJSON& mimic(JSONValue& json);
 };
 
 //typedef HGEJSONRef JSONRef; // TODO: make this type the type that gets passed around between HGE services (or maybe not...)
 
-__attribute__ ((used)) void jsonlog(JSONValue& json, HGEToolbox * toolbox); // this will be a no-op #if !HGE_DEBUG -- (so I think it should be compiled out)
+__attribute__ ((used)) void jsonlog(JSONValue& json); // this will be a no-op #if !HGE_DEBUG -- (so I think it should be compiled out)
 
-__attribute__ ((used)) void jsonlogr(HGEJSONRef& json, bool replace, HGEToolbox * toolbox); // this will be a no-op #if !HGE_DEBUG (so I think it should be compiled out)
+__attribute__ ((used)) void jsonlogr(HGEJSONRef& json, bool replace); // this will be a no-op #if !HGE_DEBUG (so I think it should be compiled out)
 
 extern "C" {
 #if HGE_DEBUG
 	__attribute__ ((used)) static void jsout(JSONValue& json) {
-		return jsonlog(json, 0);
+		return jsonlog(json);
 	}
 	__attribute__ ((used)) static void jsouto(HGEJSONRef& json) {
-		return jsonlogr(json, 0, 0);
+		return jsonlogr(json, 0);
 	}
 	__attribute__ ((used)) static void jsoutr(HGEJSONRef& json) {
-		return jsonlogr(json, !0, 0);
+		return jsonlogr(json, !0);
 	}
 	__attribute__ ((used)) static void lljlog(std::list<HGEJSONRef>& list) {
 		HGEPrint("(<\n");
 		for (std::list<HGEJSONRef>::iterator i = list.begin(); i != list.end(); i++) {
 			HGEPrint("    ");
-			(*i).log(0);
+			(*i).log();
 			HGEPrint("\n");
 		}
 		HGEPrint(">)\n");
@@ -851,7 +848,7 @@ extern "C" {
 		HGEPrint("(<\n");
 		for (std::list<JSONValue *>::iterator i = list.begin(); i != list.end(); i++) {
 			HGEPrint("    ");
-			jsonlog(*(*i), 0);
+			jsonlog(*(*i));
 			HGEPrint("\n");
 		}
 		HGEPrint(">)\n");

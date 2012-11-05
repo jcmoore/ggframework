@@ -13,7 +13,7 @@
 
 NS_HGE_BEGIN
 
-class HGEInterface;
+class HGEAPI;
 
 class HGETerminal {
 	
@@ -22,7 +22,7 @@ protected:
 	HGETerminal();
 	~HGETerminal();
 	
-	HGEInterface * interface;
+	HGEAPI * interface;
 	
 public:
 	

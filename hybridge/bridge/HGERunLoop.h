@@ -11,6 +11,8 @@
 
 #include "dev/HGEPlatformMacros.h"
 
+#include "service/HGEAPI.h"
+
 NS_HGE_BEGIN
 
 class HGERunLoop {
@@ -25,11 +27,13 @@ protected:
 public:
 	static HGERunLoop * sharedRunLoop();
 	
-	virtual void startApp(const char * path);
-	
 	void setInterval(double interval);
 	
 	double getInterval();
+	
+	virtual void startApp(const char * path);
+	
+	virtual HGEAPI * attach(void * client) = 0;
 	
 	virtual void begin() = 0;
 	

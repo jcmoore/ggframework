@@ -9,7 +9,8 @@
 #ifndef __HGECCNEXUS_H__
 #define __HGECCNEXUS_H__
 
-#include "core/HGEEntity.h"
+#include "core/HGEDoer.h"
+#include "service/HGERouter.h"
 
 #include "include/cocos2d.h"
 
@@ -18,23 +19,50 @@ NS_HGE_BEGIN
 typedef int depth_nexus;
 typedef int key_nexus;
 
-class HGECCNexus : public HGEEntity {
+class HGECCNexus : public
+HGEExplicitBoilerplate<
+HGEOnline <
+HGEImplementer <
+HGECCNexus, HGEDoer > > > {
 	
-	HGEClassifyKind(HGECCNexus, HGEEntity);
+protected:
+	
+	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGEKind<HGECCNexus>() ||
+			HGEDoer::beKind(condition, result)) {
+			if (result) {
+				*result = this;
+			}
+			return !0;
+		} else {
+			return 0;
+		}
+	}
+	
 public:
 	
-	HGECCNexus(id_hge unique)
-	: HGEEntity(unique)
+	HGECCNexus(ImpOnline::NameServer * ns)
+	: HGEDoer()
 	{
+		this->ImpOnline::bdns = ns;
 		this->cc.node = 0;
 		this->ccelevation = 0;
 	};
 	
-	virtual bool destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox);
+	/**
+	 using JSON as input, destroy the entity
+	 */
+	virtual bool destroyJSON(JSONValue& json, bool firstResponder);
 	
-	virtual bool createJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox);
+	/**
+	 using JSON as input, create the entity
+	 */
+	virtual bool createJSON(JSONValue& json, bool firstResponder);
 	
-	virtual bool enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox);
+	/**
+	 using JSON as input, take some action
+	 */
+	virtual bool enactJSON(JSONValue& task, JSONValue& json, bool firstResponder);
 	
 	
 	

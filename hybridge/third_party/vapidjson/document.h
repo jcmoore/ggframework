@@ -224,8 +224,9 @@ public:
 
 	//!@name Null
 	//@{
-
+	
 	GenericValue& SetNull() { this->~GenericValue(); ::new (this) GenericValue(); return *this; }
+	GenericValue& SetUndefined() { this->~GenericValue(); ::new (this) GenericValue(kUndefinedType); return *this; }
 
 	//@}
 

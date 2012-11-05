@@ -19,7 +19,7 @@ version_hge HGE_VERSION_UP(version_hge& current, bool autoassign)
 #endif
 }
 
-version_hge const& HGE_VERSION_ZERO()
+version_hge const& HGE_VERSION_NONE()
 {
 	static version_hge const instance = 0;
 	

@@ -20,21 +20,14 @@ NS_HGE_BEGIN
 class HGELogger : public HGEWorker {
 	
 public:
-	HGELogger();
-	virtual ~HGELogger();
+	HGELogger(const char * a) : HGEWorker(a) {};
+	virtual ~HGELogger() {};
 	
-	/**
-	 prepare to provide service
-	 */
-	virtual bool initService(uint32_t argc, const char* argn[], const char* argv[], HGEToolbox * toolbox);
 protected:
 	/**
-	 hge<<: (messageJSON) logs the messageJSON as a string
+	 <<: (messageJSON) logs the messageJSON as a string
 	 */
-	bool consumeJSON(JSONValue& json, HGEToolbox * toolbox);
-	
-public:
-	std::string& aliasName() { static std::string instance(HGE_KEYTEXT_SERVICE_LOGGER); return instance; }
+	virtual bool digestJSON(JSONValue& json);
 	
 private:
 	

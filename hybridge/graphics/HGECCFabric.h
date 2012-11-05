@@ -9,29 +9,51 @@
 #ifndef __HGECCFABRIC_H__
 #define __HGECCFABRIC_H__
 
-#include "core/HGEEntity.h"
+#include "core/HGEDoer.h"
 
 #include "include/cocos2d.h"
 
 NS_HGE_BEGIN
 
-class HGECCFabric : public HGEEntity {
+class HGECCFabric : public HGEDoer {
 	
-	HGEClassifyKind(HGECCFabric, HGEEntity);
+protected:
+	
+	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGEKind<HGECCFabric>() ||
+			HGEDoer::beKind(condition, result)) {
+			if (result) {
+				*result = this;
+			}
+			return !0;
+		} else {
+			return 0;
+		}
+	}
+	
 public:
 	
-	HGECCFabric(id_hge unique)
-	: HGEEntity(unique)
+	HGECCFabric()
+	: HGEDoer()
 	{
 		this->cc.texture = 0;
 		this->cccahced = 0;
 	};
 	
-	virtual bool destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox);
+	/**
+	 using JSON as input, destroy the entity
+	 */
+	virtual bool destroyJSON(JSONValue& json, bool firstResponder);
 	
-	virtual bool createJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox);
+	/**
+	 using JSON as input, create the entity
+	 */
+	virtual bool createJSON(JSONValue& json, bool firstResponder);
 	
-	virtual bool enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox);
+	/**
+	 using JSON as input, take some action
+	 */
+	virtual bool enactJSON(JSONValue& task, JSONValue& json, bool firstResponder);
 	
 	
 	

@@ -8,7 +8,7 @@
 
 #include "graphics/HGECCPixie.h"
 
-#include "service/HGEDispatch.h"
+#include "service/HGERouter.h"
 
 #include "graphics/HGEGraphicsMacros.h"
 #include "graphics/HGECCFabric.h"
@@ -17,7 +17,7 @@ USING_NS_CC;
 
 NS_HGE_BEGIN
 
-bool HGECCPixie::destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox)
+bool HGECCPixie::destroyJSON(JSONValue& json, bool firstResponder)
 {
 	bool didDestroy = 0;
 	
@@ -27,10 +27,10 @@ bool HGECCPixie::destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * 
 		firstResponder = 0;
 	}
 	
-	return HGECCNexus::createJSON(json, firstResponder, toolbox) || didDestroy;
+	return HGECCNexus::createJSON(json, firstResponder) || didDestroy;
 }
 
-bool HGECCPixie::createJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox)
+bool HGECCPixie::createJSON(JSONValue& json, bool firstResponder)
 {
 	bool didCreate = 0;
 	
@@ -50,10 +50,10 @@ bool HGECCPixie::createJSON(JSONValue& json, bool firstResponder, HGEToolbox * t
 		this->setFabric(json, implicit);
 	}
 	
-	return HGECCNexus::createJSON(json, firstResponder, toolbox) || didCreate;
+	return HGECCNexus::createJSON(json, firstResponder) || didCreate;
 }
 
-bool HGECCPixie::enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox)
+bool HGECCPixie::enactJSON(JSONValue& task, JSONValue& json, bool firstResponder)
 {
 	bool didEnact = 0;
 	
@@ -71,7 +71,7 @@ bool HGECCPixie::enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbo
 		}
 	}
 	
-	return didEnact || HGECCNexus::enactJSON(task, json, toolbox);
+	return didEnact || HGECCNexus::enactJSON(task, json, firstResponder);
 }
 
 
@@ -222,7 +222,7 @@ bool HGECCPixie::setFabric(JSONValue const& json, bool implicit)
 	JSONValue const * pointer = 0;
 	
 	pointer = &json["fabricDn"];
-	id_hge domain = pointer->IsNumber() ? pointer->GetUint64() : 0;
+	HGEBottomLevelDomainName domain = pointer->IsString() ? pointer->GetString() : 0;
 	
 	pointer = &json["fabricId"];
 	if (!pointer->IsNumber()) {
@@ -230,28 +230,27 @@ bool HGECCPixie::setFabric(JSONValue const& json, bool implicit)
 		return 0;
 	}
 	
-	id_hge hgeuuid = pointer->GetUint64();
-	if (!hgeuuid) {
+	HGEPortNumber port = pointer->GetUint64();
+	if (!port) {
 		HGEAssertC(implicit, "fabricId was zero...");
 		return 0;
 	}
 	
 	HGECCFabric * fabric = 0;
-	HGEEntity * entity = HGEDispatch::EntityWithId(domain, hgeuuid);
-	if (entity &&
-		entity->hgekindof(HGEKind<HGECCFabric>())) {
-		fabric = (HGECCFabric *)entity;
-	} else {
-		HGEAssertC(implicit, "fabric could not be resolved from %li/%li (domain/id)", domain, hgeuuid);
+	HGEEntity * entity = this->ImpOnline::bdns->whois(domain, port);
+	if (!entity || !entity->knownKind(HGEKind<HGECCFabric>(), &entity)) {
+		HGEAssertC(implicit, "fabric could not be resolved from %li/%li (domain/id)", domain, port);
 		return 0;
 	}
+	
+	fabric = (HGECCFabric *)entity;
 	
 	return this->setFabric(fabric);
 }
 
 bool HGECCPixie::setFabric(HGECCFabric * fabric)
 {
-	HGECCFabric * other = this->fabricRef.arrow();
+	HGECCFabric * other = this->fabricRef.coerce<HGECCFabric>();
 	
 	if (fabric != other) {
 		this->fabricRef.set(fabric);
@@ -281,7 +280,7 @@ void HGECCPixie::autoCorrect(update_priority phase)
 {
 	if (this->fabricRef.dirty()) {
 		this->setFabric(this->fabricRef.arrow());
-		HGEAssert(!this->fabricRef.dirty(), "fabric reference was not cleaned...");
+		HGEAssertC(!this->fabricRef.dirty(), "fabric reference was not cleaned...");
 	}
 }
 

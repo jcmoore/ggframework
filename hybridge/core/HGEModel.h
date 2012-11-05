@@ -9,7 +9,7 @@
 #ifndef __HGEMODEL_H__
 #define __HGEMODEL_H__
 
-#include "core/HGEKind.h"
+#include "core/HGEEntity.h"
 #include "core/HGEVersion.h"
 
 NS_HGE_BEGIN
@@ -17,35 +17,32 @@ NS_HGE_BEGIN
 /**
  base class for versioned objects of a specific kind
  */
-class HGEModel {
-	
-public:
-	HGEModel();
-	virtual ~HGEModel();
-	
-	// component support for kind classification
-	HGEClassifyBaseKind(HGEModel);
-	
-	/**
-	 update the version of the object -- to be called after the object is modified -- 
-	 works particularly in conjunction with HGERefs, to make references "dirty"
-	 when the referree object has changed in a significant way that must be taken
-	 into account by the referrer
-	 */
-	version_hge hgerevise();
-	/**
-	 get the version number of the object
-	 */
-	version_hge hgeversion() { return version; }
+class HGEModel : public HGEEntity {
 	
 protected:
-	/**
-	 get the version number of the object by reference -- only to be used by subclasses
-	 */
-	version_hge& hgerevision() { return version; }
 	
-private:
-	version_hge version;
+	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGEKind<HGEModel>() ||
+			HGEEntity::beKind(condition, result)) {
+			if (result) {
+				*result = this;
+			}
+			return !0;
+		} else {
+			return 0;
+		}
+	}
+	
+	HGE_VERSIONED_WILL_INITIALIZE(ver);
+	
+public:
+	HGEModel()
+	: HGEEntity()
+	, ver(HGE_VERSION_NONE())
+	{
+		this->revise(); // make sure it has a valid version
+	}
+	virtual ~HGEModel() {}
 };
 
 NS_HGE_END

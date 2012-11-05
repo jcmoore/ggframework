@@ -18,18 +18,39 @@ class HGECCFabric;
 
 class HGECCPixie : public HGECCNexus {
 	
-	HGEClassifyKind(HGECCPixie, HGECCNexus);
+protected:
+	
+	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGEKind<HGECCPixie>() ||
+			HGECCNexus::beKind(condition, result)) {
+			if (result) {
+				*result = this;
+			}
+			return !0;
+		} else {
+			return 0;
+		}
+	}
 public:
 	
-	HGECCPixie(id_hge unique)
-	: HGECCNexus(unique)
-	, fabricRef() {}
+	HGECCPixie(ImpOnline::NameServer * ns)
+	: HGECCNexus(ns)
+	, fabricRef() {};
 	
-	virtual bool destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox);
+	/**
+	 using JSON as input, destroy the entity
+	 */
+	virtual bool destroyJSON(JSONValue& json, bool firstResponder);
 	
-	virtual bool createJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox);
+	/**
+	 using JSON as input, create the entity
+	 */
+	virtual bool createJSON(JSONValue& json, bool firstResponder);
 	
-	virtual bool enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox);
+	/**
+	 using JSON as input, take some action
+	 */
+	virtual bool enactJSON(JSONValue& task, JSONValue& json, bool firstResponder);
 	
 	virtual void autoCorrect(update_priority phase);
 	
@@ -49,7 +70,7 @@ public:
 	
 protected:
 	
-	HGERef<HGECCFabric> fabricRef;
+	HGERef fabricRef;
 	
 };
 

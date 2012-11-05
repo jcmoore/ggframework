@@ -13,14 +13,17 @@
 
 #define HGE_KEYTEXTIFY(token)			(#token)
 
-#define HGE_KEYTEXT_UUID				"hgeid"//HGE_KEYTEXTIFY(HGE_KEYTOKEN_UUID)
-#define HGE_KEYTEXT_TASK				"hge"
+#define HGE_KEYTEXT_BOTTOM_LEVEL_DOMAIN_NAME	"."
+#define HGE_KEYTEXT_PORT_NUMBER					":"
+#define HGE_KEYTEXT_TASK						"()"
+#define HGE_KEYTEXT_ARGS						"..." //","
 
 
 
-#define HGE_KEYTEXT_SERVICE_INTERFACE	"hge$"
-#define HGE_KEYTEXT_SERVICE_LOGGER		"hge<<"
-#define HGE_KEYTEXT_SERVICE_DISPATCH	"hge@"
-#define HGE_KEYTEXT_DOMAIN				"hge."
+#define HGE_KEYTEXT_SERVICE_SUPERIOR			"$"
+#define HGE_KEYTEXT_SERVICE_ASSEMBLER			"&"
+#define HGE_KEYTEXT_SERVICE_GATE				"#"
+#define HGE_KEYTEXT_SERVICE_LOGGER				"<<"
+#define HGE_KEYTEXT_SERVICE_ROUTER				"@"
 
 #endif

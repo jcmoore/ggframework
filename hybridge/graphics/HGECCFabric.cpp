@@ -8,13 +8,13 @@
 
 #include "graphics/HGECCFabric.h"
 
-#include "service/HGEDispatch.h"
+#include "service/HGERouter.h"
 
 USING_NS_CC;
 
 NS_HGE_BEGIN
 
-bool HGECCFabric::destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox)
+bool HGECCFabric::destroyJSON(JSONValue& json, bool firstResponder)
 {
 	bool didDestroy = 0;
 	
@@ -28,7 +28,7 @@ bool HGECCFabric::destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox *
 	return didDestroy;
 }
 
-bool HGECCFabric::createJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox)
+bool HGECCFabric::createJSON(JSONValue& json, bool firstResponder)
 {
 	bool didCreate = 0;
 	
@@ -47,7 +47,7 @@ bool HGECCFabric::createJSON(JSONValue& json, bool firstResponder, HGEToolbox * 
 	return didCreate;
 }
 
-bool HGECCFabric::enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox)
+bool HGECCFabric::enactJSON(JSONValue& task, JSONValue& json, bool firstResponder)
 {
 	bool didEnact = 0;
 	
@@ -97,7 +97,8 @@ bool HGECCFabric::setURI(const char * uri)
 		this->cc.texture->retain();
 	}
 	
-	this->hgerevise();
+	//HGEAssertC(0, "need to implement models");
+	//this->hgerevise();
 	
 	return !0;
 }

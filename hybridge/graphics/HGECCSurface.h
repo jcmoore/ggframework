@@ -15,17 +15,38 @@ NS_HGE_BEGIN
 
 class HGECCSurface : public HGECCNexus {
 	
-	HGEClassifyKind(HGECCSurface, HGECCNexus);
+protected:
+	
+	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGEKind<HGECCSurface>() ||
+			HGECCNexus::beKind(condition, result)) {
+			if (result) {
+				*result = this;
+			}
+			return !0;
+		} else {
+			return 0;
+		}
+	}
 public:
 	
-	HGECCSurface(id_hge unique)
-	: HGECCNexus(unique) {};
+	HGECCSurface(ImpOnline::NameServer * ns)
+	: HGECCNexus(ns) {};
 	
-	virtual bool destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox);
+	/**
+	 using JSON as input, destroy the entity
+	 */
+	virtual bool destroyJSON(JSONValue& json, bool firstResponder);
 	
-	virtual bool createJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox);
+	/**
+	 using JSON as input, create the entity
+	 */
+	virtual bool createJSON(JSONValue& json, bool firstResponder);
 	
-	virtual bool enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox);
+	/**
+	 using JSON as input, take some action
+	 */
+	virtual bool enactJSON(JSONValue& task, JSONValue& json, bool firstResponder);
 	
 	
 	

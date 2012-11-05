@@ -1,5 +1,5 @@
 //
-//  HGERef.h
+//  RefHGE.h
 //  hybridge
 //
 //  Created by The Narrator on 8/21/12.
@@ -19,75 +19,182 @@ NS_HGE_BEGIN
  its version can be compared to to the contained object's version
  to determine whether or not the reference is "out of date"
  */
-class HGERefKind : public HGEModel {
-	HGEClassifyBaseKind(HGERefKind); // TODO: FIX THIS !!! .. or not (maybe don't need different 'kinds' for each HGERef<Type>
-public:
-	HGERefKind() : HGEModel() {}
-	virtual ~HGERefKind() {}
-	
-	virtual kind_hge refkind() = 0;
-	virtual bool refkindof(kind_hge k) = 0;
-};
 
-class HGEEntity;
 
-template <typename HGEPointed = HGEEntity>
-class HGERef : public HGERefKind {
+class HGEHandle {
 public:
-	/**
-	 get the kind uuid of the contained object (if one exists)
-	 */
-	virtual kind_hge refkind() { return this->obj ? this->obj->hgekind() : HGEKindNone(); }
-	
-	/**
-	 test against the kind of the contained object (if one exists)
-	 */
-	virtual bool refkindof(kind_hge k) { return this->obj ? this->obj->hgekindof(k) : k == HGEKindNone(); }
-	
-private:
-	
-	// TODO: find a more elegant way to enforce this constraint
-	HGEModel * proof () { return obj; } // template type must be subclass of HGEModel
-	
-public:
-	HGERef() : HGERefKind(), obj(0) {}
-	virtual ~HGERef() {}
+	HGEHandle() : obj(0) {}
 	
 	/**
 	 true if the reference contains no object
 	 */
 	bool unset () { return this->obj == 0; }
 	/**
+	 refer to the indicated value
+	 */
+	void set (HGEEntity * value) {
+		this->obj = value;
+	}
+	
+	/**
+	 return the contained object pointer if it can be coerced into the specified type
+	 */
+	template < typename T >
+	T * coerce() {
+		HGEEntity * entity = this->arrow();
+		return (entity ? entity->asKind<T>() : 0);
+	}
+	
+	/**
+	 return the contained object pointer
+	 */
+	HGEEntity * arrow() { return this->obj; }
+	
+	/**
+	 return the contained object reference -- be sure the reference is not unset!
+	 */
+	HGEEntity& dot() { return *this->obj; }
+private:
+	HGEEntity * obj;
+};
+
+
+
+class HGERef {
+	
+	HGE_VERSIONED_WILL_INITIALIZE(ver);
+	
+public:
+	HGERef() : ver(HGE_VERSION_NONE()), handle() {}
+	
+	/**
+	 true if the reference contains no object
+	 */
+	bool unset () { return this->handle.unset() == 0; }
+	/**
 	 true if the reference's version does not match the contained object's version
 	 */
-	bool dirty () { return (!this->unset() && this->proof()->hgeversion() != this->hgeversion()); }
+	bool dirty () { return (!this->cache ? !this->unset() : (this->vnumber() != this->cache->vnumber())); }
 	
 	/**
 	 matches the reference's version to the contained object's version --
 	 typically called after the referrer as accounted for changes in the referree
 	 */
 	version_hge clean () {
-		return (hgerevision() = (this->unset() ? HGE_VERSION_ZERO() : this->proof()->hgeversion()));
+		return (this->revision() = (this->cache ? this->cache->vnumber() : HGE_VERSION_NONE()));
 	}
 	/**
 	 refer to the indicated value
 	 */
-	version_hge set (HGEPointed * value) {
-		obj = value;
-		return clean();
+	version_hge set (HGEEntity * value) {
+		this->handle.set(value);
+		
+		this->cache = 0;
+		if (value) {
+			HGEEntity * model = 0;
+			if (value->knownKind(HGEKind<HGEModel>(), &model)) {
+				this->cache = (HGEModel *)model;
+			}
+		}
+		return this->clean();
+	}
+	
+	/**
+	 return the contained object pointer if it can be coerced into the specified type
+	 */
+	template < typename T >
+	T * coerce() {
+		return this->handle.coerce<T>();
 	}
 	
 	/**
 	 return the contained object pointer
 	 */
-	HGEPointed * arrow() { return obj; }
+	HGEEntity * arrow() { return this->handle.arrow(); }
 	
 	/**
 	 return the contained object reference -- be sure the reference is not unset!
 	 */
-	HGEPointed& dot() { return *obj; }
+	HGEEntity& dot() { return this->handle.dot(); }
+	
 private:
-	HGEPointed * obj;
+	HGEHandle handle;
+	HGEModel * cache;
+};
+
+class HGEUmp : public HGEModel {
+	
+protected:
+	
+	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGEKind<HGEUmp>() ||
+			HGEEntity::beKind(condition, result)) { // act like an entity but not a model (even though it is a model...)
+			if (result) {
+				*result = this;
+			}
+			return !0;
+		} else {
+			return 0;
+		}
+	}
+	
+public:
+	HGEUmp() : HGEModel() {}
+	virtual ~HGEUmp() {}
+	
+	/**
+	 true if the reference contains no object
+	 */
+	bool unset () { return this->handle.unset() == 0; }
+	/**
+	 true if the reference's version does not match the contained object's version
+	 */
+	bool dirty () { return (!this->cache ? !this->unset() : (this->vnumber() != this->cache->vnumber())); }
+	
+	/**
+	 matches the reference's version to the contained object's version --
+	 typically called after the referrer as accounted for changes in the referree
+	 */
+	version_hge clean () {
+		return (this->revision() = (this->cache ? this->cache->vnumber() : HGE_VERSION_NONE()));
+	}
+	/**
+	 refer to the indicated value
+	 */
+	version_hge set (HGEEntity * value) {
+		this->handle.set(value);
+		
+		this->cache = 0;
+		if (value) {
+			HGEEntity * model = 0;
+			if (value->knownKind(HGEKind<HGEModel>(), &model)) {
+				this->cache = (HGEModel *)model;
+			}
+		}
+		return this->clean();
+	}
+	
+	/**
+	 return the contained object pointer if it can be coerced into the specified type
+	 */
+	template < typename T >
+	T * coerce() {
+		return this->handle.coerce<T>();
+	}
+	
+	/**
+	 return the contained object pointer
+	 */
+	HGEEntity * arrow() { return this->handle.arrow(); }
+	
+	/**
+	 return the contained object reference -- be sure the reference is not unset!
+	 */
+	HGEEntity& dot() { return this->handle.dot(); }
+	
+private:
+	HGEHandle handle;
+	HGEModel * cache;
 };
 
 NS_HGE_END

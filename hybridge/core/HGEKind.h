@@ -12,17 +12,17 @@
 #include "core/HGEID.h"
 #include "dev/HGEMacros.h"
 
-// add kind component -- base-kind
-#define HGEClassifyBaseKind(kind)		\
-public: \
-virtual kind_hge hgekind() { return HGEKind<kind>(); } \
-virtual bool hgekindof(kind_hge k) { return k == this->hgekind(); }
+//// add kind component -- base-kind
+//#define HGEClassifyBaseKind(kind)		\
+//public: \
+//virtual kind_hge hgekind() { return HGEKind<kind>(); } \
+//virtual bool hgekindof(kind_hge k) { return k == this->hgekind(); }
 
 // add kind component -- sub-kind
-#define HGEClassifyKind(subkind, superkind)		\
-public: \
-virtual kind_hge hgekind() { return HGEKind<subkind>(); } \
-virtual bool hgekindof(kind_hge k) { return k == subkind::hgekind() || superkind::hgekindof(k); }
+//#define HGEClassifyKind(subkind, superkind)		\
+//public: \
+//virtual kind_hge hgekind() { return HGEKind<subkind>(); } \
+//virtual bool hgekindof(kind_hge k) { return k == subkind::hgekind() || superkind::hgekindof(k); }
 
 NS_HGE_BEGIN
 

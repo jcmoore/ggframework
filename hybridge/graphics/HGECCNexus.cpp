@@ -8,13 +8,13 @@
 
 #include "graphics/HGECCNexus.h"
 
-#include "service/HGEDispatch.h"
+#include "service/HGERouter.h"
 
 USING_NS_CC;
 
 NS_HGE_BEGIN
 
-bool HGECCNexus::destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox)
+bool HGECCNexus::destroyJSON(JSONValue& json, bool firstResponder)
 {
 	bool didDestroy = 0;
 	
@@ -27,7 +27,7 @@ bool HGECCNexus::destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * 
 	return didDestroy;
 }
 
-bool HGECCNexus::createJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox)
+bool HGECCNexus::createJSON(JSONValue& json, bool firstResponder)
 {
 	bool didCreate = 0;
 	
@@ -50,7 +50,7 @@ bool HGECCNexus::createJSON(JSONValue& json, bool firstResponder, HGEToolbox * t
 	return didCreate;
 }
 
-bool HGECCNexus::enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox)
+bool HGECCNexus::enactJSON(JSONValue& task, JSONValue& json, bool firstResponder)
 {
 	bool didEnact = 0;
 	
@@ -82,7 +82,7 @@ bool HGECCNexus::addLeaf(JSONValue const& json, bool implicit)
 	JSONValue const * pointer = 0;
 	
 	pointer = &json["leafDn"];
-	id_hge domain = pointer->IsNumber() ? pointer->GetUint64() : 0;
+	HGEBottomLevelDomainName domain = pointer->IsString() ? pointer->GetString() : 0;
 	
 	pointer = &json["leafId"];
 	if (!pointer->IsNumber()) {
@@ -90,19 +90,22 @@ bool HGECCNexus::addLeaf(JSONValue const& json, bool implicit)
 		return 0;
 	}
 	
-	id_hge hgeuuid = pointer->GetUint64();
-	if (!hgeuuid) {
+	HGEPortNumber port = pointer->GetUint64();
+	if (!port) {
 		HGEAssertC(implicit, "leafId was zero...");
 		return 0;
 	}
 	
 	HGECCNexus * leaf = 0;
-	HGEEntity * entity = HGEDispatch::EntityWithId(domain, hgeuuid);
-	if (entity &&
-		entity->hgekindof(HGEKind<HGECCNexus>())) {
-		leaf = (HGECCNexus *)entity;
-	} else {
-		HGEAssertC(implicit, "leaf could not be resolved from %li/%li (domain/id)", domain, hgeuuid);
+	HGEEntity * entity = this->ImpOnline::bdns->whois(domain, port);
+	if (!entity || !entity->knownKind(HGEKind<HGECCNexus>(), &entity)) {
+		HGEAssertC(implicit, "leaf could not be resolved from %li/%li (domain/port)", domain, port);
+		return 0;
+		
+	}
+	
+	if (!(leaf = entity->asKind<HGECCNexus>())) {
+		HGEAssertC(implicit, "proposed leaf was not a nexus");
 		return 0;
 	}
 	

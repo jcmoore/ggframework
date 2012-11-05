@@ -8,13 +8,13 @@
 
 #include "graphics/HGECCField.h"
 
-//#include "service/HGEDispatch.h"
+//#include "service/HGERouter.h"
 
 USING_NS_CC;
 
 NS_HGE_BEGIN
 
-bool HGECCField::destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox)
+bool HGECCField::destroyJSON(JSONValue& json, bool firstResponder)
 {
 	bool didDestroy = 0;
 	
@@ -24,10 +24,10 @@ bool HGECCField::destroyJSON(JSONValue& json, bool firstResponder, HGEToolbox * 
 		firstResponder = 0;
 	}
 	
-	return HGECCNexus::createJSON(json, firstResponder, toolbox) || didDestroy;
+	return HGECCNexus::createJSON(json, firstResponder) || didDestroy;
 }
 
-bool HGECCField::createJSON(JSONValue& json, bool firstResponder, HGEToolbox * toolbox)
+bool HGECCField::createJSON(JSONValue& json, bool firstResponder)
 {
 	bool didCreate = 0;
 	
@@ -43,14 +43,14 @@ bool HGECCField::createJSON(JSONValue& json, bool firstResponder, HGEToolbox * t
 		
 	}
 	
-	return HGECCNexus::createJSON(json, firstResponder, toolbox) || didCreate;
+	return HGECCNexus::createJSON(json, firstResponder) || didCreate;
 }
 
-bool HGECCField::enactJSON(JSONValue& task, JSONValue& json, HGEToolbox * toolbox)
+bool HGECCField::enactJSON(JSONValue& task, JSONValue& json, bool firstResponder)
 {
 	bool didEnact = 0;
 	
-	return didEnact || HGECCNexus::enactJSON(task, json, toolbox);
+	return didEnact || HGECCNexus::enactJSON(task, json, firstResponder);
 }
 
 NS_HGE_END

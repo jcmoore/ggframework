@@ -10,20 +10,4 @@
 
 NS_HGE_BEGIN
 
-HGEModel::HGEModel()
-: version(HGE_VERSION_ZERO())
-{
-	
-}
-
-HGEModel::~HGEModel() {
-	
-}
-
-version_hge HGEModel::hgerevise() {
-	HGE_VERSION_UP(this->version);
-	
-	return this->version;
-}
-
 NS_HGE_END
