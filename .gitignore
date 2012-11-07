@@ -9,3 +9,5 @@
 *.xcuserstate
 *.nexe
 *.swp
+
+*/boost/*
