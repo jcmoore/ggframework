@@ -10,4 +10,4 @@
 *.nexe
 *.swp
 
-*/boost/*
+boost/
