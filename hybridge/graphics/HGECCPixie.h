@@ -18,10 +18,23 @@ class HGECCFabric;
 
 class HGECCPixie : public HGECCNexus {
 	
+public:
+	
+	virtual bool is(kind_hge concrete, HGEEntity ** result) {
+		if (HGE_KINDOF( HGECCPixie ) == concrete) {
+			if (result) {
+				*result = this;
+			}
+			return !0;
+		} else {
+			return this->HGECCNexus::is(concrete, result);
+		}
+	}
+	
 protected:
 	
-	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
-		if (kind_hge(condition) == HGEKind<HGECCPixie>() ||
+	virtual bool beKind (MagicChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGE_KINDOF( HGECCPixie ) ||
 			HGECCNexus::beKind(condition, result)) {
 			if (result) {
 				*result = this;
@@ -33,7 +46,7 @@ protected:
 	}
 public:
 	
-	HGECCPixie(ImpOnline::NameServer * ns)
+	HGECCPixie(MagicOnline::NameServer * ns)
 	: HGECCNexus(ns)
 	, fabricRef() {};
 	

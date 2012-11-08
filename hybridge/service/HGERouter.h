@@ -20,10 +20,11 @@ NS_HGE_BEGIN
 
 typedef const char * HGEBottomLevelDomainName;
 typedef id_hge HGEPortNumber;
-typedef std::map< HGEPortNumber, HGEDoer * > HGEPortMap;
+typedef HGEWhite<>::Magic HGEHandler;
+typedef std::map< HGEPortNumber, HGEHandler * > HGEPortMap;
 // TODO: can I make std::string instead const char * ?
 typedef std::map< std::string const, HGEPortMap * > HGEDomainMap;
-typedef HGEDoer * (*HGEGenerator)(id_hge);
+typedef HGEHandler * (*HGEGenerator)(id_hge);
 typedef std::map< const char *, HGEGenerator, cmpstr > HGEGeneratorMap;
 
 /**
@@ -41,11 +42,11 @@ public:
 		TableInterface() {}
 		~TableInterface() {}
 		
-		virtual HGEDoer * whois(HGEBottomLevelDomainName bldn, HGEPortNumber port) = 0;
+		virtual HGEHandler * whois(HGEBottomLevelDomainName bldn, HGEPortNumber port) = 0;
 		
-		virtual bool assign(HGEDoer * owner, HGEBottomLevelDomainName bldn, HGEPortNumber port) = 0;
+		virtual bool assign(HGEHandler * owner, HGEBottomLevelDomainName bldn, HGEPortNumber port) = 0;
 		
-		virtual bool revoke(HGEDoer * owner, HGEBottomLevelDomainName bldn, HGEPortNumber port) = 0;
+		virtual bool revoke(HGEHandler * owner, HGEBottomLevelDomainName bldn, HGEPortNumber port) = 0;
 		
 	protected:
 		virtual void flip(HGEWorker * producer, HGERouter::BottomLevelNameServerInterface * bdns) = 0;
@@ -62,7 +63,7 @@ public:
 		BottomLevelNameServerInterface() {}
 		~BottomLevelNameServerInterface() {}
 		
-		virtual HGEDoer * whois(HGEBottomLevelDomainName bldn, HGEPortNumber port) = 0;
+		virtual HGEHandler * whois(HGEBottomLevelDomainName bldn, HGEPortNumber port) = 0;
 	};
 	
 	class SpawnerInterface {
@@ -70,12 +71,12 @@ public:
 		SpawnerInterface() {}
 		~SpawnerInterface() {}
 		
-		virtual HGEDoer * generateDoer(const char* type,
-									   JSONValue& json,
-									   HGEBottomLevelDomainName bldn,
-									   HGEPortNumber port,
-									   HGERouter * router,
-									   HGERouter::BottomLevelNameServerInterface * dns) = 0;
+		virtual HGEHandler * generate(const char* type,
+									  JSONValue& json,
+									  HGEBottomLevelDomainName bldn,
+									  HGEPortNumber port,
+									  HGERouter * router,
+									  HGERouter::BottomLevelNameServerInterface * dns) = 0;
 	};
 	
 	HGERouter(const char * a,
@@ -121,7 +122,7 @@ public:
 		}
 		~BottomLevelNameServer() {}
 		
-		virtual HGEDoer * whois(HGEBottomLevelDomainName bldn, HGEPortNumber port) {
+		virtual HGEHandler * whois(HGEBottomLevelDomainName bldn, HGEPortNumber port) {
 			HGEAssertC(this->table, "this name server has no table . . . probably a mistake");
 			return this->table->whois(bldn, port);
 		}
@@ -139,7 +140,7 @@ public:
 			this->flip(0, 0);
 		};
 		
-		virtual HGEDoer * whois(HGEBottomLevelDomainName bldn, HGEPortNumber port) {
+		virtual HGEHandler * whois(HGEBottomLevelDomainName bldn, HGEPortNumber port) {
 			
 			HGEPortMap * listing = 0;
 			
@@ -156,7 +157,7 @@ public:
 		
 	protected:
 		
-		virtual bool assign(HGEDoer * owner, HGEBottomLevelDomainName bldn, HGEPortNumber port) {
+		virtual bool assign(HGEHandler * owner, HGEBottomLevelDomainName bldn, HGEPortNumber port) {
 			if (owner == 0) {
 				HGEAssertC(0, "no valid owner provided for assignment (requests to clear records should invoke revoke() instead)");
 				return 0;
@@ -181,7 +182,7 @@ public:
 			return !0;
 		}
 		
-		virtual bool revoke(HGEDoer * owner, HGEBottomLevelDomainName bldn, HGEPortNumber port) {
+		virtual bool revoke(HGEHandler * owner, HGEBottomLevelDomainName bldn, HGEPortNumber port) {
 			HGEPortMap * listing = 0;
 			
 			this->safeDomain(bldn, &listing);
@@ -247,20 +248,62 @@ public:
 
 
 
-HGE_BOILERPLATE(HGEOnline, BaseType)
-{
-	HGE_BOILERPLATE_SUGAR_IMP(HGEOnline, ImpOnline);
-	HGE_BOILERPLATE_SUGAR_REAL(BaseType, RealOnline);
+template < typename ParentImp = HGENone >
+class HGEOnline;
+
+
+template <>
+class HGEOnline< HGENone > {
+public:
+	
+	struct Magic : public HGEBlack<>::Magic {
+	};
+};
+
+template < typename ParentImp >
+class HGEOnline : public ParentImp {
+public:
+	typedef HGEOnline MagicOnline;
+	typedef ParentImp MagicParent;
+	typedef typename MagicParent::MagicDerived RealOnline;
+	
+	struct Magic : public HGEChip<>::Magic {
+		
+		virtual bool does(like_hge interface, HGEBlack<>::Magic ** result) {
+			return this->that->does(interface, result);
+		}
+		
+		Magic(MagicOnline * t) : that(t) {
+			HGEAssertC(this->that, "cannot do magic without 'that'");
+		}
+	private:
+		MagicOnline * that;
+	};
+	
+	virtual bool does(like_hge interface, HGEBlack<>::Magic ** result) {
+		if (HGE_LIKEA( hybridge::HGEOnline ) == interface) {
+			if (result) {
+				*result = this->trick();
+			}
+			return !0;
+		} else {
+			return this->MagicParent::does(interface, result);
+		}
+	}
+	
+	Magic * trick() { return &magic; }
+	
+	HGEOnline() : magic(this),  bdns(0) {}
+	
+private:
+	
+	Magic magic;
 	
 public:
 	
 	typedef HGERouter::BottomLevelNameServerInterface NameServer;
 	
-	HGEOnline() : bdns(0) {
-		if (!static_cast<HGEEntity *>(this)) {
-			HGEAssertC(0, "only entity base-types are allowed");
-		}
-	}
+	virtual void call () {}
 	
 protected:
 	

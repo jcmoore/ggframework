@@ -254,7 +254,7 @@ HGEJSONRef& HGEJSONRef::subDeref(id_hge hgeuuid) {
 	HGEEntity * entity = 0; //HGEDispatch::EntityWithId(0, hgeuuid);
 	HGEEntity * surrogate = 0;
 	if (entity &&
-		entity->knownKind(HGEKind<HGESurrogate>(), &surrogate)) {
+		entity->knownKind(HGE_KINDOF( HGESurrogate ), &surrogate)) {
 		return ((HGESurrogate *)surrogate)->contents();
 	}
 	

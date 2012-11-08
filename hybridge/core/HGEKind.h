@@ -12,6 +12,8 @@
 #include "core/HGEID.h"
 #include "dev/HGEMacros.h"
 
+#define HGE_KINDOF(t)			HGEKind<t>()
+
 //// add kind component -- base-kind
 //#define HGEClassifyBaseKind(kind)		\
 //public: \
@@ -26,10 +28,12 @@
 
 NS_HGE_BEGIN
 
+typedef void HGENone;
+
 // type for hybrid kind uuids
 typedef id_hge kind_hge;
 
-// WARNING: currently the numeric value of a kind is execution order dependent!
+// WARNING: currently the numeric value of a kind is execution order dependent!  (NEED TO ADD SERIALIZATION)
 
 /**
  specialized class to handle generation of kind uuids
@@ -66,14 +70,14 @@ struct HGEKind {
  specialized class used to express the kind uuid for undefined kinds
  */
 template<>
-struct HGEKind<void> {
+struct HGEKind< HGENone > {
 	
 	HGEKind() {};
 	
 	operator kind_hge () { return 0; }
 };
 
-typedef HGEKind<void>	HGEKindNone;
+typedef HGEKind< HGENone >	HGEKindNone;
 
 NS_HGE_END
 

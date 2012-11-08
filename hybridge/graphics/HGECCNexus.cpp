@@ -96,17 +96,13 @@ bool HGECCNexus::addLeaf(JSONValue const& json, bool implicit)
 		return 0;
 	}
 	
-	HGECCNexus * leaf = 0;
-	HGEEntity * entity = this->ImpOnline::bdns->whois(domain, port);
-	if (!entity || !entity->knownKind(HGEKind<HGECCNexus>(), &entity)) {
+	HGEHandler * handler = this->MagicOnline::bdns->whois(domain, port);
+	HGECCNexus * leaf = this->toKind<HGECCNexus>(handler);
+	
+	if (!leaf) {
 		HGEAssertC(implicit, "leaf could not be resolved from %li/%li (domain/port)", domain, port);
 		return 0;
 		
-	}
-	
-	if (!(leaf = entity->asKind<HGECCNexus>())) {
-		HGEAssertC(implicit, "proposed leaf was not a nexus");
-		return 0;
 	}
 	
 	pointer = &json["ele"];

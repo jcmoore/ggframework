@@ -26,8 +26,21 @@ class HGESuperior;
  */
 class HGEWorker : public
 HGECircuit <
-HGEImplementer	<
+HGEPublic <
 HGEWorker, HGEEntity > > {
+	
+public:
+	
+	virtual bool is(kind_hge concrete, HGEEntity ** result) {
+		if (HGE_KINDOF( HGEWorker ) == concrete) {
+			if (result) {
+				*result = this;
+			}
+			return !0;
+		} else {
+			return this->HGEEntity::is(concrete, result);
+		}
+	}
 	
 public:
 	HGEWorker(const char * a)

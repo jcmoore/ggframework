@@ -236,14 +236,12 @@ bool HGECCPixie::setFabric(JSONValue const& json, bool implicit)
 		return 0;
 	}
 	
-	HGECCFabric * fabric = 0;
-	HGEEntity * entity = this->ImpOnline::bdns->whois(domain, port);
-	if (!entity || !entity->knownKind(HGEKind<HGECCFabric>(), &entity)) {
+	HGEHandler * handler = this->MagicOnline::bdns->whois(domain, port);
+	HGECCFabric * fabric = this->toKind<HGECCFabric>(handler);
+	if (!fabric) {
 		HGEAssertC(implicit, "fabric could not be resolved from %li/%li (domain/id)", domain, port);
 		return 0;
 	}
-	
-	fabric = (HGECCFabric *)entity;
 	
 	return this->setFabric(fabric);
 }

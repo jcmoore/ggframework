@@ -32,8 +32,8 @@ class HGEJotter : public HGEEntity {
 	
 protected:
 	
-	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
-		if (kind_hge(condition) == HGEKind<HGEJotter>() ||
+	virtual bool beKind (MagicChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGE_KINDOF( HGEJotter ) ||
 			HGEEntity::beKind(condition, result)) {
 			if (result) {
 				*result = this;

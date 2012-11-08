@@ -15,21 +15,350 @@
 
 #include <limits.h>
 
+#include "service/HGEJSON.h"
+
 NS_HGE_BEGIN
 
 
 
+template < typename ConcreteType = HGENone, typename ParentImp = HGENone >
+class HGEBlack;
 
-HGE_BOILERPLATE(HGEChip, BaseType)
-{
-	HGE_BOILERPLATE_SUGAR_IMP(HGEChip, ImpChip);
-	HGE_BOILERPLATE_SUGAR_REAL(BaseType, RealChip);
-	
+
+template <>
+class HGEBlack< HGENone, HGENone > {
 public:
 	
-	virtual bool does(kind_hge isolatedInterface) {
-		return isolatedInterface == HGEKind< HGEChip < HGEBasis > >() || BaseType::does(isolatedInterface);
+	struct Magic {
+		virtual bool does(like_hge interface, HGEBlack<>::Magic ** result) = 0;
+		
+		template < typename Kind >
+		HGEBlack<>::Magic * does() {
+			HGEBlack<>::Magic * result = 0;
+			like_hge interface = HGE_LIKEAN_UNSAFE( Kind );
+			if (this->does(interface, &result)) {
+				return result;
+			} else {
+				return 0;
+			}
+		}
+		
+		template < typename Destination, typename Intermediate >
+		Destination * with() {
+			typedef typename HGEBlack< Intermediate >::Magic Informer;
+			Intermediate * concrete = 0;
+			HGEBlack<>::Magic * other = does< HGEBlack<> >();
+			if (other) {
+				Informer * informer = static_cast< Informer * >(other);
+				if (informer->with(HGE_KINDOF(Destination), &concrete)) {
+					return dynamic_cast< Destination * >( concrete );
+				}
+			}
+			return 0;
+		}
+	};
+};
+
+
+template < typename ConcreteType >
+class HGEBlack< ConcreteType, HGENone > {
+public:
+	
+	struct Magic : HGEBlack<>::Magic {
+		virtual bool with(kind_hge concrete, ConcreteType ** result) = 0;
+	};
+};
+
+
+template < typename ConcreteType, typename ParentImp >
+class HGEBlack : public ParentImp {
+public:
+	typedef ParentImp Parent;
+	typedef HGEBlack MagicParent;
+	typedef MagicParent MagicBlack;
+	typedef typename Parent::MagicConcrete MagicConcrete;
+	typedef typename Parent::MagicDerived MagicDerived;
+	
+	struct Magic : public HGEBlack< ConcreteType >::Magic {
+		
+		virtual bool does(like_hge interface, HGEBlack<>::Magic ** result) {
+			return this->that->does(interface, result);
+		}
+		
+		virtual bool with(kind_hge concrete, ConcreteType ** result) {
+			return this->that->is(concrete, result);
+		}
+		
+		Magic(MagicBlack * t) : that(t) {
+			HGEAssertC(this->that, "cannot do magic without 'that'");
+		}
+	private:
+		MagicBlack * that;
+	};
+	
+	virtual bool does(like_hge interface, HGEBlack<>::Magic ** result) {
+		if (HGE_LIKEA( hybridge::HGEBlack ) == interface) {
+			if (result) {
+				*result = this->trick();
+			}
+			return !0;
+		} else {
+			return 0;
+		}
 	}
+	
+	virtual bool is(kind_hge concrete, ConcreteType ** result) {
+		if (HGE_KINDOF( MagicParent ) == concrete) {
+			if (result) {
+				*result = static_cast< ConcreteType * >(this);
+			}
+			return !0;
+		} else {
+			return 0;
+		}
+	}
+	
+	Magic * trick() { return &magic; }
+	
+	HGEBlack() : magic(this) {}
+	
+private:
+	
+	Magic magic;
+	
+};
+
+
+
+
+
+template < typename ParentImp = HGENone >
+class HGEWhite;
+
+
+template <>
+class HGEWhite< HGENone > {
+public:
+	
+	struct Magic : public HGEBlack<>::Magic {
+		/**
+		 using JSON as input, destroy the entity
+		 */
+		virtual bool destroyJSON(JSONValue& json, bool firstResponder) = 0;
+		
+		/**
+		 using JSON as input, create the entity
+		 */
+		virtual bool createJSON(JSONValue& json, bool firstResponder) = 0;
+		
+		/**
+		 using JSON as input, take some action
+		 */
+		virtual bool enactJSON(JSONValue& task, JSONValue& json, bool firstResponder) = 0;
+	};
+};
+
+
+template < typename ParentImp >
+class HGEWhite : public ParentImp {
+public:
+	
+	typedef HGEWhite MagicWhite;
+	typedef ParentImp MagicParent;
+	typedef typename MagicParent::MagicDerived RealWhite;
+	
+	struct Magic : public HGEWhite<>::Magic {
+		
+		virtual bool does(like_hge interface, HGEBlack<>::Magic ** result) {
+			return this->that->does(interface, result);
+		}
+		
+		/**
+		 using JSON as input, destroy the entity
+		 */
+		virtual bool destroyJSON(JSONValue& json, bool firstResponder) {
+			return this->that->destroyJSON(json, firstResponder);
+		}
+		
+		/**
+		 using JSON as input, create the entity
+		 */
+		virtual bool createJSON(JSONValue& json, bool firstResponder) {
+			return this->that->createJSON(json, firstResponder);
+		}
+		
+		/**
+		 using JSON as input, take some action
+		 */
+		virtual bool enactJSON(JSONValue& task, JSONValue& json, bool firstResponder) {
+			return this->that->enactJSON(task, json, firstResponder);
+		}
+		
+		Magic(MagicWhite * t) : that(t) {}
+		
+	private:
+		MagicWhite * that;
+	};
+	
+	virtual bool does(like_hge interface, HGEBlack<>::Magic ** result) {
+		if (HGE_LIKEA( hybridge::HGEWhite ) == interface) {
+			if (result) {
+				*result = this->trick();
+			}
+			return !0;
+		} else {
+			return this->MagicParent::does(interface, result);
+		}
+	}
+	
+	/**
+	 using JSON as input, destroy the entity
+	 */
+	virtual bool destroyJSON(JSONValue& json, bool firstResponder) = 0;
+	
+	/**
+	 using JSON as input, create the entity
+	 */
+	virtual bool createJSON(JSONValue& json, bool firstResponder) = 0;
+	
+	/**
+	 using JSON as input, take some action
+	 */
+	virtual bool enactJSON(JSONValue& task, JSONValue& json, bool firstResponder) = 0;
+	
+	Magic * trick() { return &magic; }
+	
+	HGEWhite() : magic(this) {}
+	
+private:
+	
+	Magic magic;
+	
+};
+
+
+class HGEGremlin : public
+HGEBlack < HGEGremlin,
+HGEPublic <
+HGEGremlin, void > > {
+	
+};
+
+
+
+
+
+
+template < typename ParentImp = HGENone >
+class HGEImp;
+
+
+template <>
+class HGEImp< HGENone > {
+public:
+	
+	struct Magic {
+		virtual bool does(like_hge match, HGEImp<>::Magic ** result) = 0;
+	};
+};
+
+template < typename ParentImp >
+class HGEImp : public ParentImp {
+public:
+	typedef HGEImp MagicImp;
+	typedef ParentImp MagicParent;
+	typedef typename MagicParent::MagicDerived RealImp;
+	
+	struct Magic : public HGEImp<>::Magic {
+		
+		virtual bool does(like_hge interface, HGEImp<>::Magic ** result) {
+			return this->that->does(interface, result);
+		}
+		
+		Magic(MagicImp * t) : that(t) {
+			HGEAssertC(this->that, "cannot do magic without 'that'");
+		}
+	private:
+		MagicImp * that;
+	};
+	
+	virtual bool does(like_hge interface, HGEImp<>::Magic ** result) {
+		if (HGE_LIKEA(hybridge::HGEImp) == interface) {
+			if (result) {
+				*result = this->trick();
+			}
+		} else {
+			return 0;
+		}
+	}
+	
+	Magic * trick() { return &magic; }
+	
+	HGEImp() : magic(this) {}
+	
+private:
+	
+	Magic magic;
+	
+};
+
+
+
+
+
+template < typename ParentImp = HGENone >
+class HGEChip;
+
+
+template <>
+class HGEChip< HGENone > {
+public:
+	
+	struct Magic : public HGEBlack<>::Magic {
+	};
+};
+
+template < typename ParentImp >
+class HGEChip : public ParentImp {
+public:
+	typedef HGEChip MagicChip;
+	typedef ParentImp MagicParent;
+	typedef typename MagicParent::MagicConcrete MagicConcrete;
+	typedef typename MagicParent::MagicDerived RealChip;
+	
+	struct Magic : public HGEChip<>::Magic {
+		
+		virtual bool does(like_hge interface, HGEBlack<>::Magic ** result) {
+			return this->that->does(interface, result);
+		}
+		
+		Magic(MagicChip * t) : that(t) {
+			HGEAssertC(this->that, "cannot do magic without 'that'");
+		}
+	private:
+		MagicChip * that;
+	};
+	
+	virtual bool does(like_hge interface, HGEBlack<>::Magic ** result) {
+		if (HGE_LIKEA( hybridge::HGEChip ) == interface) {
+			if (result) {
+				*result = this->trick();
+			}
+			return !0;
+		} else {
+			return this->MagicParent::does(interface, result);
+		}
+	}
+	
+	Magic * trick() { return &magic; }
+	
+	HGEChip() : magic(this) {}
+	
+private:
+	
+	Magic magic;
+	
+public:
 	
 	typedef void * Condition;
 	typedef bool (RealChip::*Matcher)(Condition condition, RealChip ** result);
@@ -39,8 +368,6 @@ protected:
 	bool known (Matcher matcher, Condition condition, RealChip ** result = 0) {
 		return (static_cast<RealChip *>(this)->*matcher)(condition, result);
 	}
-	
-public:
 	
 };
 
@@ -56,7 +383,7 @@ HGE_BOILERPLATE(HGECircuit, BaseType)
 public:
 	
 	virtual bool does(kind_hge isolatedInterface) {
-		return isolatedInterface == HGEKind< HGECircuit < HGEBasis > >() || BaseType::does(isolatedInterface);
+		return 0;//isolatedInterface == HGE_IMPOF( HGECircuit ) || BaseType::does(isolatedInterface);
 	}
 	
 private:

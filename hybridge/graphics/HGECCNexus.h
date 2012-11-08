@@ -20,16 +20,29 @@ typedef int depth_nexus;
 typedef int key_nexus;
 
 class HGECCNexus : public
-HGEExplicitBoilerplate<
 HGEOnline <
-HGEImplementer <
-HGECCNexus, HGEDoer > > > {
+HGEWhite <
+HGEVirtualPublic <
+HGECCNexus, HGEEntity > > > {
+	
+public:
+	
+	virtual bool is(kind_hge concrete, HGEEntity ** result) {
+		if (HGE_KINDOF( HGECCNexus ) == concrete) {
+			if (result) {
+				*result = this;
+			}
+			return !0;
+		} else {
+			return this->HGEEntity::is(concrete, result);
+		}
+	}
 	
 protected:
 	
-	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
-		if (kind_hge(condition) == HGEKind<HGECCNexus>() ||
-			HGEDoer::beKind(condition, result)) {
+	virtual bool beKind (MagicChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGE_KINDOF( HGECCNexus ) ||
+			HGEEntity::beKind(condition, result)) {
 			if (result) {
 				*result = this;
 			}
@@ -41,10 +54,10 @@ protected:
 	
 public:
 	
-	HGECCNexus(ImpOnline::NameServer * ns)
-	: HGEDoer()
+	HGECCNexus(MagicOnline::NameServer * ns)
+	: HGEEntity()
 	{
-		this->ImpOnline::bdns = ns;
+		this->MagicOnline::bdns = ns;
 		this->cc.node = 0;
 		this->ccelevation = 0;
 	};

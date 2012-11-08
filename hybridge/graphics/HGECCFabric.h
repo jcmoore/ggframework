@@ -10,18 +10,36 @@
 #define __HGECCFABRIC_H__
 
 #include "core/HGEDoer.h"
+#include "service/HGERouter.h"
 
 #include "include/cocos2d.h"
 
 NS_HGE_BEGIN
 
-class HGECCFabric : public HGEDoer {
+class HGECCFabric : public
+HGEOnline <
+HGEWhite <
+HGEVirtualPublic <
+HGECCFabric, HGEEntity > > > {
+	
+public:
+	
+	virtual bool is(kind_hge concrete, HGEEntity ** result) {
+		if (HGE_KINDOF( HGECCFabric ) == concrete) {
+			if (result) {
+				*result = this;
+			}
+			return !0;
+		} else {
+			return this->HGEEntity::is(concrete, result);
+		}
+	}
 	
 protected:
 	
-	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
-		if (kind_hge(condition) == HGEKind<HGECCFabric>() ||
-			HGEDoer::beKind(condition, result)) {
+	virtual bool beKind (MagicChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGE_KINDOF( HGECCFabric ) ||
+			HGEEntity::beKind(condition, result)) {
 			if (result) {
 				*result = this;
 			}
@@ -33,9 +51,10 @@ protected:
 	
 public:
 	
-	HGECCFabric()
-	: HGEDoer()
+	HGECCFabric(MagicOnline::NameServer * ns)
+	: HGEEntity()
 	{
+		this->MagicOnline::bdns = ns;
 		this->cc.texture = 0;
 		this->cccahced = 0;
 	};

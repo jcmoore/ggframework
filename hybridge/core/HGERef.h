@@ -92,7 +92,7 @@ public:
 		this->cache = 0;
 		if (value) {
 			HGEEntity * model = 0;
-			if (value->knownKind(HGEKind<HGEModel>(), &model)) {
+			if (value->knownKind(HGE_KINDOF( HGEModel ), &model)) {
 				this->cache = (HGEModel *)model;
 			}
 		}
@@ -126,8 +126,8 @@ class HGEUmp : public HGEModel {
 	
 protected:
 	
-	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
-		if (kind_hge(condition) == HGEKind<HGEUmp>() ||
+	virtual bool beKind (MagicChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGE_KINDOF( HGEUmp ) ||
 			HGEEntity::beKind(condition, result)) { // act like an entity but not a model (even though it is a model...)
 			if (result) {
 				*result = this;
@@ -167,7 +167,7 @@ public:
 		this->cache = 0;
 		if (value) {
 			HGEEntity * model = 0;
-			if (value->knownKind(HGEKind<HGEModel>(), &model)) {
+			if (value->knownKind(HGE_KINDOF( HGEModel ), &model)) {
 				this->cache = (HGEModel *)model;
 			}
 		}

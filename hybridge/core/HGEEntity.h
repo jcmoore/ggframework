@@ -30,13 +30,27 @@ NS_HGE_BEGIN
  */
 class HGEEntity : public
 HGEChip <
-HGEImplementer <
-HGEEntity > > {
+HGEBlack< HGEEntity,
+HGEPublic <
+HGEEntity, void > > > {
+	
+public:
+	
+	virtual bool is(kind_hge concrete, HGEEntity ** result) {
+		if (HGE_KINDOF( HGEEntity ) == concrete) {
+			if (result) {
+				*result = this;
+			}
+			return !0;
+		} else {
+			return this->MagicParent::is(concrete, result);
+		}
+	}
 	
 protected:
 	
-	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
-		if (kind_hge(condition) == HGEKind<HGEEntity>()) {
+	virtual bool beKind (MagicChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGE_KINDOF( HGEEntity )) {
 			if (result) {
 				*result = this;
 			}
@@ -46,24 +60,24 @@ protected:
 		}
 	}
 	
-	virtual bool myKind (ImpChip::Condition condition, RealChip ** result) {
+	virtual bool myKind (MagicChip::Condition condition, RealChip ** result) {
 		return this->beKind(condition, result);
 	}
 	
 private:
 	
-	bool beKindNonVirtual (ImpChip::Condition condition, RealChip ** result) {
+	bool beKindNonVirtual (MagicChip::Condition condition, RealChip ** result) {
 		return this->beKind(condition, result);
 	}
 	
-	bool myKindNonVirtual (ImpChip::Condition condition, RealChip ** result) {
+	bool myKindNonVirtual (MagicChip::Condition condition, RealChip ** result) {
 		return this->myKind(condition, result);
 	}
 	
 public:
 	
 	bool knownKind (kind_hge condition, HGEEntity ** result) { // TODO: do something smarter with this...
-		return ImpChip::known(&HGEEntity::myKindNonVirtual, ImpChip::Condition(condition), result);
+		return MagicChip::known(&HGEEntity::myKindNonVirtual, MagicChip::Condition(condition), result);
 	}
 	
 	bool integratedKind (kind_hge condition, HGEEntity ** result) {
@@ -84,7 +98,12 @@ public:
 		return dynamic_cast<T*>(this);
 		//return reinterpret_cast<T*>(this);
 		//return (T*)(void*)this;
-	} 
+	}
+	
+	template <typename T>
+	T * toKind(HGEBlack<>::Magic * from) {
+		return from ? from->with< T, HGEEntity >() : 0;
+	}
 };
 
 NS_HGE_END

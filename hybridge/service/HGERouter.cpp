@@ -19,9 +19,9 @@ HGERouter::HGERouter(const char * a,
 , bdns(b)
 , spawner(s)
 {
-	HGEAssertC(this->does(HGEKind< HGEChip< HGEBasis > >()), "!HGEChip");
-	HGEAssertC(this->does(HGEKind< HGECircuit< HGEBasis > >()), "!HGECircuit");
-	HGEAssertC(this->does(HGEKind< HGEOnline< HGEBasis > >()), "!HGEOnline");
+	//HGEAssertC(this->does(HGE_IMPOF( HGEChip )), "!HGEChip");
+	//HGEAssertC(this->does(HGE_IMPOF( HGECircuit )), "!HGECircuit");
+	//HGEAssertC(this->does(HGE_IMPOF( HGEOnline )), "!HGEOnline");
 	
 	HGEAssertC(this->table, "router needs a valid table");
 	HGEAssertC(this->bdns, "router needs a valid bottom level name server");
@@ -71,28 +71,28 @@ bool HGERouter::digestJSON(JSONValue& json) {
 	
 	HGEPortMap::iterator iter = (safeListing->insert(HGEPortMap::value_type(portNumber, 0))).first;
 	
-	HGEDoer *& doer = iter->second;
+	HGEHandler *& handler = iter->second;
 	
 	const JSONKey * taskString = task.IsString() ? task.GetString() : 0;
 	
-	if (doer) {
+	if (handler) {
 		if (taskString &&
 			taskString[0] == '~') {
-			bool result = doer->destroyJSON(json, !0);
-			HGEDeleteNull(doer);
+			bool result = handler->destroyJSON(json, !0);
+			HGEDeleteNull(handler);
 			safeListing->erase(iter);
 			return result;
 		} else {
-			return doer->enactJSON(task, json, !0);
+			return handler->enactJSON(task, json, !0);
 		}
 	} else if (taskString) {
 		if (taskString[0] == '~') {
 			safeListing->erase(iter);
 			return !0;
 		} else {
-			doer = this->spawner->generateDoer(taskString, json, safeBLDN, portNumber, this, this->bdns);
-			if (doer) {
-				return doer->createJSON(json, !0);
+			handler = this->spawner->generate(taskString, json, safeBLDN, portNumber, this, this->bdns);
+			if (handler) {
+				return handler->createJSON(json, !0);
 			}
 			HGEAssertC(0, "failed to generate doer");
 		}

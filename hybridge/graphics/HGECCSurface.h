@@ -15,10 +15,23 @@ NS_HGE_BEGIN
 
 class HGECCSurface : public HGECCNexus {
 	
+public:
+	
+	virtual bool is(kind_hge concrete, HGEEntity ** result) {
+		if (HGE_KINDOF( HGECCSurface ) == concrete) {
+			if (result) {
+				*result = this;
+			}
+			return !0;
+		} else {
+			return this->HGECCNexus::is(concrete, result);
+		}
+	}
+	
 protected:
 	
-	virtual bool beKind (ImpChip::Condition condition, RealChip ** result) {
-		if (kind_hge(condition) == HGEKind<HGECCSurface>() ||
+	virtual bool beKind (MagicChip::Condition condition, RealChip ** result) {
+		if (kind_hge(condition) == HGE_KINDOF( HGECCSurface ) ||
 			HGECCNexus::beKind(condition, result)) {
 			if (result) {
 				*result = this;
@@ -30,7 +43,7 @@ protected:
 	}
 public:
 	
-	HGECCSurface(ImpOnline::NameServer * ns)
+	HGECCSurface(MagicOnline::NameServer * ns)
 	: HGECCNexus(ns) {};
 	
 	/**
