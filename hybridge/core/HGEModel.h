@@ -21,7 +21,7 @@ class HGEModel : public HGEEntity {
 	
 protected:
 	
-	virtual bool beKind (MagicChip::Condition condition, RealChip ** result) {
+	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		if (kind_hge(condition) == HGE_KINDOF( HGEModel ) ||
 			HGEEntity::beKind(condition, result)) {
 			if (result) {

@@ -17,7 +17,7 @@ class HGECCSurface : public HGECCNexus {
 	
 public:
 	
-	virtual bool is(kind_hge concrete, HGEEntity ** result) {
+	virtual bool is(kind_hge concrete, MagicBlack::MagicDerived ** result) {
 		if (HGE_KINDOF( HGECCSurface ) == concrete) {
 			if (result) {
 				*result = this;
@@ -30,7 +30,7 @@ public:
 	
 protected:
 	
-	virtual bool beKind (MagicChip::Condition condition, RealChip ** result) {
+	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		if (kind_hge(condition) == HGE_KINDOF( HGECCSurface ) ||
 			HGECCNexus::beKind(condition, result)) {
 			if (result) {

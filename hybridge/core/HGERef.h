@@ -126,7 +126,7 @@ class HGEUmp : public HGEModel {
 	
 protected:
 	
-	virtual bool beKind (MagicChip::Condition condition, RealChip ** result) {
+	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		if (kind_hge(condition) == HGE_KINDOF( HGEUmp ) ||
 			HGEEntity::beKind(condition, result)) { // act like an entity but not a model (even though it is a model...)
 			if (result) {

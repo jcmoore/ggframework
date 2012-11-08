@@ -21,26 +21,32 @@ typedef int key_nexus;
 
 class HGECCNexus : public
 HGEOnline <
-HGEWhite <
-HGEVirtualPublic <
-HGECCNexus, HGEEntity > > > {
+HGECanRout <
+HGEEntity > > {
 	
 public:
 	
-	virtual bool is(kind_hge concrete, HGEEntity ** result) {
+	virtual bool is(kind_hge concrete, MagicBlack::MagicDerived ** result) {
 		if (HGE_KINDOF( HGECCNexus ) == concrete) {
 			if (result) {
 				*result = this;
 			}
 			return !0;
 		} else {
-			return this->HGEEntity::is(concrete, result);
+			HGEEntity * fallback = 0;
+			if (this->HGEEntity::is(concrete, &fallback)) {
+				if (result) {
+					*result = this;
+				}
+				return !0;
+			}
 		}
+		return 0;
 	}
 	
 protected:
 	
-	virtual bool beKind (MagicChip::Condition condition, RealChip ** result) {
+	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		if (kind_hge(condition) == HGE_KINDOF( HGECCNexus ) ||
 			HGEEntity::beKind(condition, result)) {
 			if (result) {
@@ -55,7 +61,7 @@ protected:
 public:
 	
 	HGECCNexus(MagicOnline::NameServer * ns)
-	: HGEEntity()
+	//: HGEEntity()
 	{
 		this->MagicOnline::bdns = ns;
 		this->cc.node = 0;

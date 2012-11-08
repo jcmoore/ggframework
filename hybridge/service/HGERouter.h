@@ -12,6 +12,7 @@
 #include "service/HGEWorker.h"
 #include "util/HGEUtilString.h"
 #include "core/HGEDoer.h"
+#include "core/can/HGECanRout.h"
 
 #include <map>
 #include <list>
@@ -20,7 +21,7 @@ NS_HGE_BEGIN
 
 typedef const char * HGEBottomLevelDomainName;
 typedef id_hge HGEPortNumber;
-typedef HGEWhite<>::Magic HGEHandler;
+typedef HGECanRout<>::Magic HGEHandler;
 typedef std::map< HGEPortNumber, HGEHandler * > HGEPortMap;
 // TODO: can I make std::string instead const char * ?
 typedef std::map< std::string const, HGEPortMap * > HGEDomainMap;
@@ -248,7 +249,7 @@ public:
 
 
 
-template < typename ParentImp = HGENone >
+template < typename Parent = HGENone >
 class HGEOnline;
 
 
@@ -256,21 +257,28 @@ template <>
 class HGEOnline< HGENone > {
 public:
 	
-	struct Magic : public HGEBlack<>::Magic {
+	struct Magic : public HGECanImp<>::Magic<> {
 	};
 };
 
-template < typename ParentImp >
-class HGEOnline : public ParentImp {
+template < typename Parent >
+class HGEOnline : public Parent {
 public:
-	typedef HGEOnline MagicOnline;
-	typedef ParentImp MagicParent;
-	typedef typename MagicParent::MagicDerived RealOnline;
 	
-	struct Magic : public HGEChip<>::Magic {
+	typedef Parent RealParent;
+	typedef typename Parent::MagicConcrete MagicConcrete;
+	typedef typename Parent::MagicDerived MagicDerived;
+	typedef HGEOnline MagicOnline;
+	typedef HGEOnline MagicParent;
+	
+	struct Magic : public HGECanImp<>::Magic< MagicDerived, HGEOnline<>::Magic > {
 		
-		virtual bool does(like_hge interface, HGEBlack<>::Magic ** result) {
+		virtual bool does(like_hge interface, HGECanImp<>::Magic<> ** result) {
 			return this->that->does(interface, result);
+		}
+		
+		virtual bool with(kind_hge concrete, MagicDerived ** result) {
+			return this->that->is(concrete, result);
 		}
 		
 		Magic(MagicOnline * t) : that(t) {
@@ -280,14 +288,14 @@ public:
 		MagicOnline * that;
 	};
 	
-	virtual bool does(like_hge interface, HGEBlack<>::Magic ** result) {
+	virtual bool does(like_hge interface, HGECanImp<>::Magic<> ** result) {
 		if (HGE_LIKEA( hybridge::HGEOnline ) == interface) {
 			if (result) {
 				*result = this->trick();
 			}
 			return !0;
 		} else {
-			return this->MagicParent::does(interface, result);
+			return this->RealParent::does(interface, result);
 		}
 	}
 	

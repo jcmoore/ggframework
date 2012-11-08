@@ -202,6 +202,7 @@ template <>
 class HGEPublic< void > {
 public:
 	HGEPublic() {}
+	virtual ~HGEPublic() {}
 	typedef HGEPublic MagicParent;
 	typedef HGEPublic MagicConcrete;
 };

@@ -9,7 +9,8 @@
 #ifndef __HGEENTITY_H__
 #define __HGEENTITY_H__
 
-#include "core/HGECircuit.h"
+#include "core/can/HGECanImp.h"
+#include "core/can/HGECanChip.h"
 #include "service/HGEJSON.h"
 #include "core/HGEKind.h"
 
@@ -29,14 +30,14 @@ NS_HGE_BEGIN
  base class of all uniquely identifiable instance-based sub-services that can turn JSON into actions
  */
 class HGEEntity : public
-HGEChip <
-HGEBlack< HGEEntity,
+HGECanChip <
+HGECanImp <
 HGEPublic <
 HGEEntity, void > > > {
 	
 public:
 	
-	virtual bool is(kind_hge concrete, HGEEntity ** result) {
+	virtual bool is(kind_hge concrete, MagicBlack::MagicDerived ** result) {
 		if (HGE_KINDOF( HGEEntity ) == concrete) {
 			if (result) {
 				*result = this;
@@ -49,7 +50,7 @@ public:
 	
 protected:
 	
-	virtual bool beKind (MagicChip::Condition condition, RealChip ** result) {
+	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		if (kind_hge(condition) == HGE_KINDOF( HGEEntity )) {
 			if (result) {
 				*result = this;
@@ -60,36 +61,36 @@ protected:
 		}
 	}
 	
-	virtual bool myKind (MagicChip::Condition condition, RealChip ** result) {
+	virtual bool myKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		return this->beKind(condition, result);
 	}
 	
 private:
 	
-	bool beKindNonVirtual (MagicChip::Condition condition, RealChip ** result) {
+	bool beKindNonVirtual (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		return this->beKind(condition, result);
 	}
 	
-	bool myKindNonVirtual (MagicChip::Condition condition, RealChip ** result) {
+	bool myKindNonVirtual (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		return this->myKind(condition, result);
 	}
 	
 public:
 	
 	bool knownKind (kind_hge condition, HGEEntity ** result) { // TODO: do something smarter with this...
-		return MagicChip::known(&HGEEntity::myKindNonVirtual, MagicChip::Condition(condition), result);
+		return this->MagicChip::known(&HGEEntity::myKindNonVirtual, MagicChip::Condition(condition), result);
 	}
 	
 	bool integratedKind (kind_hge condition, HGEEntity ** result) {
 		HGEAssertC(0, "is this ever called?");
 		return 0;
-		//return ImpCircuit::integrated(&HGEEntity::beKindNonVirtual, ImpCircuit::Condition(condition), result);
+		//return this->ImpCircuit::integrated(&HGEEntity::beKindNonVirtual, ImpCircuit::Condition(condition), result);
 	}
 	
 	bool unknownKind (kind_hge condition, HGEEntity ** result) {
 		HGEAssertC(0, "is this ever called?");
 		return 0;
-		//return ImpCircuit::unknown(&HGEEntity::beKindNonVirtual, ImpCircuit::Condition(condition), result);
+		//return this->ImpCircuit::unknown(&HGEEntity::beKindNonVirtual, ImpCircuit::Condition(condition), result);
 	}
 	
 	template <typename T>
@@ -101,8 +102,8 @@ public:
 	}
 	
 	template <typename T>
-	T * toKind(HGEBlack<>::Magic * from) {
-		return from ? from->with< T, HGEEntity >() : 0;
+	T * toKind(HGECanImp<>::Magic<> * from) {
+		return from ? from->with< T, MagicDerived >() : 0;
 	}
 };
 

@@ -19,8 +19,8 @@ HGERouter::HGERouter(const char * a,
 , bdns(b)
 , spawner(s)
 {
-	//HGEAssertC(this->does(HGE_IMPOF( HGEChip )), "!HGEChip");
-	//HGEAssertC(this->does(HGE_IMPOF( HGECircuit )), "!HGECircuit");
+	//HGEAssertC(this->does(HGE_IMPOF( HGECanChip )), "!HGECanChip");
+	//HGEAssertC(this->does(HGE_IMPOF( HGECanCircuit )), "!HGECanCircuit");
 	//HGEAssertC(this->does(HGE_IMPOF( HGEOnline )), "!HGEOnline");
 	
 	HGEAssertC(this->table, "router needs a valid table");

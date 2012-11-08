@@ -15,6 +15,8 @@
 
 #include "core/HGEEntity.h"
 
+#include "core/can/HGECanCircuit.h"
+
 #include <string>
 
 NS_HGE_BEGIN
@@ -25,21 +27,27 @@ class HGESuperior;
  abstract base object capable of fulfilling a hybrid service request
  */
 class HGEWorker : public
-HGECircuit <
-HGEPublic <
-HGEWorker, HGEEntity > > {
+HGECanCircuit < HGEWorker, 
+HGEEntity > {
 	
 public:
 	
-	virtual bool is(kind_hge concrete, HGEEntity ** result) {
+	virtual bool is(kind_hge concrete, MagicBlack::MagicDerived ** result) {
 		if (HGE_KINDOF( HGEWorker ) == concrete) {
 			if (result) {
 				*result = this;
 			}
 			return !0;
 		} else {
-			return this->HGEEntity::is(concrete, result);
+			HGEEntity * fallback = 0;
+			if (this->HGEEntity::is(concrete, &fallback)) {
+				if (result) {
+					*result = this;
+				}
+				return !0;
+			}
 		}
+		return 0;
 	}
 	
 public:
