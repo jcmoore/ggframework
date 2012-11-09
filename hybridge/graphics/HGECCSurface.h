@@ -17,14 +17,14 @@ class HGECCSurface : public HGECCNexus {
 	
 public:
 	
-	virtual bool is(kind_hge concrete, MagicBlack::MagicDerived ** result) {
+	virtual bool areYou(kind_hge concrete, MagicBlack::MagicDerived ** result) {
 		if (HGE_KINDOF( HGECCSurface ) == concrete) {
 			if (result) {
 				*result = this;
 			}
 			return !0;
 		} else {
-			return this->HGECCNexus::is(concrete, result);
+			return this->HGECCNexus::areYou(concrete, result);
 		}
 	}
 	
@@ -43,8 +43,8 @@ protected:
 	}
 public:
 	
-	HGECCSurface(MagicOnline::NameServer * ns)
-	: HGECCNexus(ns) {};
+	HGECCSurface(MagicOnline::NameServer * ns, MagicJotter::Producer * p)
+	: HGECCNexus(ns, p) {};
 	
 	/**
 	 using JSON as input, destroy the entity

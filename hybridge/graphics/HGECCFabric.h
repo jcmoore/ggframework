@@ -9,37 +9,20 @@
 #ifndef __HGECCFABRIC_H__
 #define __HGECCFABRIC_H__
 
-#include "core/HGEDoer.h"
-#include "service/HGERouter.h"
+#include "core/can/HGECanRout.h"
+#include "core/can/HGECanJott.h"
 
 #include "include/cocos2d.h"
 
 NS_HGE_BEGIN
 
 class HGECCFabric : public
-HGEOnline <
-HGECanRout <
-HGEEntity > > {
+HGECanJott < HGECCFabric,
+HGECanRout < HGECCFabric,
+HGECanImp < HGECCFabric,
+HGEEntity > > > {
 	
 public:
-	
-	virtual bool is(kind_hge concrete, MagicBlack::MagicDerived ** result) {
-		if (HGE_KINDOF( HGECCFabric ) == concrete) {
-			if (result) {
-				*result = this;
-			}
-			return !0;
-		} else {
-			HGEEntity * fallback = 0;
-			if (this->HGEEntity::is(concrete, &fallback)) {
-				if (result) {
-					*result = this;
-				}
-				return !0;
-			}
-		}
-		return 0;
-	}
 	
 protected:
 	
@@ -57,10 +40,10 @@ protected:
 	
 public:
 	
-	HGECCFabric(MagicOnline::NameServer * ns)
+	HGECCFabric(MagicJotter::Producer * p)
 	//: HGEEntity()
 	{
-		this->MagicOnline::bdns = ns;
+		this->MagicJotter::producer = p;
 		this->cc.texture = 0;
 		this->cccahced = 0;
 	};

@@ -47,7 +47,7 @@ bool HGEGate::digestJSON(JSONValue& json) {
 	this->produceJSON(brief);
 	
 	if (!this->offQueue->Empty()) {
-		HGEAssertC(0, "unexpected (but note catastrophic[?]) gate flush request when off queue is not empty (investigate why)");
+		//HGEAssertC(0, "unexpected (but note catastrophic[?]) gate flush request when off queue is not empty (investigate why)");
 		this->openJSON(brief); // clear what will become the main queue
 	}
 	

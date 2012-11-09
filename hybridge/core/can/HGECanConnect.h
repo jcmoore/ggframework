@@ -1,31 +1,26 @@
 //
-//  HGECanChip.h
+//  HGECanConnect.h
 //  hybridge
 //
 //  Created by The Narrator on 11/8/12.
 //  Copyright (c) 2012 Starduu. All rights reserved.
 //
 
-#ifndef __HGECANCHIP_H__
-#define __HGECANCHIP_H__
+#ifndef __HGECANCONNECT_H__
+#define __HGECANCONNECT_H__
 
 #include "core/can/HGECanImp.h"
+#include "service/HGERouter.h"
 
 
 
 NS_HGE_BEGIN
-
-
-
 template < typename Derived = HGENone, typename Parent = Derived >
-class HGECanChip;
-
-template < typename Parent >
-class HGECanChip< Parent, Parent >;
+class HGECanConnect;
 
 
 template <>
-class HGECanChip<> {
+class HGECanConnect<> {
 public:
 	
 	struct Magic : public HGECanImp<>::Magic<> {
@@ -33,16 +28,16 @@ public:
 };
 
 template < typename Derived, typename Parent >
-class HGECanChip : public Parent {
+class HGECanConnect : public Parent {
 public:
 	
-	typedef HGECanChip MagicChip;
-	typedef HGECanChip MagicParent;
-	typedef Derived MagicDerived;
+	typedef HGECanConnect MagicOnline;
+	typedef HGECanConnect MagicParent;
 	typedef Parent RealParent;
+	typedef Derived MagicDerived;
 	
 private:
-	typedef HGECanImp<>::Magic< MagicDerived, HGECanChip<>::Magic > Trick;
+	typedef HGECanImp<>::Magic< MagicDerived, HGECanConnect<>::Magic > Trick;
 public:
 	
 	struct Magic : public Trick {
@@ -50,7 +45,7 @@ public:
 	};
 	
 	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
-		if (HGE_LIKEA( hybridge::HGECanChip ) == interface) {
+		if (HGE_LIKEA( hybridge::HGECanConnect ) == interface) {
 			if (result) {
 				*result = this->feat();
 			}
@@ -62,7 +57,7 @@ public:
 	
 	Magic * feat() { return &magic; }
 	
-	HGECanChip() : magic(static_cast<MagicDerived *>(this)) {}
+	HGECanConnect() : magic(static_cast<MagicDerived *>(this)),  bdns(0) {}
 	
 private:
 	
@@ -70,14 +65,15 @@ private:
 	
 public:
 	
-	typedef void * Condition;
-	typedef bool (MagicDerived::*Matcher)(Condition condition, MagicDerived ** result);
+	typedef HGERouter::BottomLevelNameServerInterface NameServer;
+	
+	virtual void call () {}
 	
 protected:
 	
-	bool known (Matcher matcher, Condition condition, MagicDerived ** result = 0) {
-		return (static_cast<MagicDerived *>(this)->*matcher)(condition, result);
-	}
+	NameServer * bdns;
+	
+private:
 	
 };
 

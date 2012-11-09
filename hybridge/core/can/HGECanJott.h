@@ -1,15 +1,16 @@
 //
-//  HGECanChip.h
+//  HGECanJott.h
 //  hybridge
 //
 //  Created by The Narrator on 11/8/12.
 //  Copyright (c) 2012 Starduu. All rights reserved.
 //
 
-#ifndef __HGECANCHIP_H__
-#define __HGECANCHIP_H__
+#ifndef __HGECANJOTT_H__
+#define __HGECANJOTT_H__
 
 #include "core/can/HGECanImp.h"
+#include "service/HGEWorker.h"
 
 
 
@@ -18,14 +19,11 @@ NS_HGE_BEGIN
 
 
 template < typename Derived = HGENone, typename Parent = Derived >
-class HGECanChip;
-
-template < typename Parent >
-class HGECanChip< Parent, Parent >;
+class HGECanJott;
 
 
 template <>
-class HGECanChip<> {
+class HGECanJott<> {
 public:
 	
 	struct Magic : public HGECanImp<>::Magic<> {
@@ -33,16 +31,16 @@ public:
 };
 
 template < typename Derived, typename Parent >
-class HGECanChip : public Parent {
+class HGECanJott : public Parent {
 public:
 	
-	typedef HGECanChip MagicChip;
-	typedef HGECanChip MagicParent;
-	typedef Derived MagicDerived;
+	typedef HGECanJott MagicJotter;
+	typedef HGECanJott MagicParent;
 	typedef Parent RealParent;
+	typedef Derived MagicDerived;
 	
 private:
-	typedef HGECanImp<>::Magic< MagicDerived, HGECanChip<>::Magic > Trick;
+	typedef HGECanImp<>::Magic< MagicDerived, HGECanJott<>::Magic > Trick;
 public:
 	
 	struct Magic : public Trick {
@@ -50,7 +48,7 @@ public:
 	};
 	
 	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
-		if (HGE_LIKEA( hybridge::HGECanChip ) == interface) {
+		if (HGE_LIKEA( hybridge::HGECanJott ) == interface) {
 			if (result) {
 				*result = this->feat();
 			}
@@ -62,7 +60,7 @@ public:
 	
 	Magic * feat() { return &magic; }
 	
-	HGECanChip() : magic(static_cast<MagicDerived *>(this)) {}
+	HGECanJott() : magic(static_cast<MagicDerived *>(this)) {}
 	
 private:
 	
@@ -70,14 +68,18 @@ private:
 	
 public:
 	
-	typedef void * Condition;
-	typedef bool (MagicDerived::*Matcher)(Condition condition, MagicDerived ** result);
+	typedef HGEWorker Producer;
+	
+	/**
+	 send json to a worker
+	 */
+	bool produce(JSONValue& json, bool purify = 0) {
+		return this->producer->produceJSON(json, purify);
+	}
 	
 protected:
 	
-	bool known (Matcher matcher, Condition condition, MagicDerived ** result = 0) {
-		return (static_cast<MagicDerived *>(this)->*matcher)(condition, result);
-	}
+	Producer * producer;
 	
 };
 

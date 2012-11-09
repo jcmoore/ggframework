@@ -1,13 +1,13 @@
 //
-//  HGECCPixie.h
+//  HGECCTroop.h
 //  hybridge
 //
-//  Created by The Narrator on 10/29/12.
+//  Created by The Narrator on 11/8/12.
 //
 //
 
-#ifndef __HGECCPIXIE_H__
-#define __HGECCPIXIE_H__
+#ifndef __HGECCTROOP_H__
+#define __HGECCTROOP_H__
 
 #include "graphics/HGECCNexus.h"
 #include "core/HGERef.h"
@@ -16,12 +16,12 @@ NS_HGE_BEGIN
 
 class HGECCFabric;
 
-class HGECCPixie : public HGECCNexus {
+class HGECCTroop : public HGECCNexus {
 	
 public:
 	
 	virtual bool areYou(kind_hge concrete, MagicBlack::MagicDerived ** result) {
-		if (HGE_KINDOF( HGECCPixie ) == concrete) {
+		if (HGE_KINDOF( HGECCTroop ) == concrete) {
 			if (result) {
 				*result = this;
 			}
@@ -34,7 +34,7 @@ public:
 protected:
 	
 	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
-		if (kind_hge(condition) == HGE_KINDOF( HGECCPixie ) ||
+		if (kind_hge(condition) == HGE_KINDOF( HGECCTroop ) ||
 			HGECCNexus::beKind(condition, result)) {
 			if (result) {
 				*result = this;
@@ -46,7 +46,7 @@ protected:
 	}
 public:
 	
-	HGECCPixie(MagicOnline::NameServer * ns, MagicJotter::Producer * p)
+	HGECCTroop(MagicOnline::NameServer * ns, MagicJotter::Producer * p)
 	: HGECCNexus(ns, p)
 	, fabricRef() {};
 	
@@ -69,14 +69,14 @@ public:
 	
 	
 	
-	virtual bool setBox(JSONValue const& json, bool implicit = 0);
-	virtual bool setBox(float x, float y, float w, float h);
+	//virtual bool setBox(JSONValue const& json, bool implicit = 0);
+	//virtual bool setBox(float x, float y, float w, float h);
 	
-	virtual bool setPigment(JSONValue const& json, bool implicit = 0);
-	virtual bool setPigment(float r, float g, float b);
+	//virtual bool setPigment(JSONValue const& json, bool implicit = 0);
+	//virtual bool setPigment(float r, float g, float b);
 	
-	virtual bool setDensity(JSONValue const& json, bool implicit = 0);
-	virtual bool setDensity(float a);
+	//virtual bool setDensity(JSONValue const& json, bool implicit = 0);
+	//virtual bool setDensity(float a);
 	
 	virtual bool setFabric(JSONValue const& json, bool implicit = 0);
 	virtual bool setFabric(HGECCFabric * fabric);

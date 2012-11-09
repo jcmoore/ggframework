@@ -30,23 +30,11 @@ NS_HGE_BEGIN
  base class of all uniquely identifiable instance-based sub-services that can turn JSON into actions
  */
 class HGEEntity : public
-HGECanChip <
-HGECanImp <
-HGEPublic <
-HGEEntity, void > > > {
+HGECanChip < HGEEntity, 
+HGECanImp < HGEEntity,
+void > > {
 	
 public:
-	
-	virtual bool is(kind_hge concrete, MagicBlack::MagicDerived ** result) {
-		if (HGE_KINDOF( HGEEntity ) == concrete) {
-			if (result) {
-				*result = this;
-			}
-			return !0;
-		} else {
-			return this->MagicParent::is(concrete, result);
-		}
-	}
 	
 protected:
 	
@@ -99,11 +87,6 @@ public:
 		return dynamic_cast<T*>(this);
 		//return reinterpret_cast<T*>(this);
 		//return (T*)(void*)this;
-	}
-	
-	template <typename T>
-	T * toKind(HGECanImp<>::Magic<> * from) {
-		return from ? from->with< T, MagicDerived >() : 0;
 	}
 };
 

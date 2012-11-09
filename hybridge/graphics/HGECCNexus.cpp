@@ -97,7 +97,7 @@ bool HGECCNexus::addLeaf(JSONValue const& json, bool implicit)
 	}
 	
 	HGEHandler * handler = this->MagicOnline::bdns->whois(domain, port);
-	HGECCNexus * leaf = this->toKind<HGECCNexus>(handler);
+	HGECCNexus * leaf = handler ? handler->canTo<HGECCNexus>() : 0;
 	
 	if (!leaf) {
 		HGEAssertC(implicit, "leaf could not be resolved from %li/%li (domain/port)", domain, port);

@@ -6,8 +6,8 @@
 //  Copyright (c) 2012 Starduu. All rights reserved.
 //
 
-#ifndef __HGECIRCUIT_H__
-#define __HGECIRCUIT_H__
+#ifndef __HGECANCIRCUIT_H__
+#define __HGECANCIRCUIT_H__
 
 #include "core/can/HGECanImp.h"
 
@@ -17,7 +17,7 @@ NS_HGE_BEGIN
 
 
 
-template < typename CircuitDerived = void, typename Parent = CircuitDerived >
+template < typename Derived = void, typename Parent = Derived >
 class HGECanCircuit;
 
 
@@ -29,41 +29,31 @@ public:
 	};
 };
 
-template < typename CircuitDerived, typename Parent >
+template < typename Derived, typename Parent >
 class HGECanCircuit : public Parent {
 public:
 	
-	typedef Parent RealParent;
-	typedef typename Parent::MagicConcrete MagicConcrete;
-	typedef typename Parent::MagicDerived MagicDerived;
 	typedef HGECanCircuit MagicCircuit;
 	typedef HGECanCircuit MagicParent;
+	typedef Parent RealParent;
+	typedef Derived MagicDerived;
 	
-	struct Magic : public HGECanImp<>::Magic< MagicDerived, HGECanCircuit<>::Magic > {
-		
-		virtual bool does(like_hge interface, HGECanImp<>::Magic<> ** result) {
-			return this->that->does(interface, result);
-		}
-		
-		virtual bool with(kind_hge concrete, MagicDerived ** result) {
-			return this->that->is(concrete, result);
-		}
-		
-		Magic(MagicCircuit * t) : that(t) {
-			HGEAssertC(this->that, "cannot do magic without 'that'");
-		}
-	private:
-		MagicCircuit * that;
+private:
+	typedef HGECanImp<>::Magic< MagicDerived, HGECanCircuit<>::Magic > Trick;
+public:
+	
+	struct Magic : public Trick {
+		Magic(MagicDerived * d) : Trick(d) {}
 	};
 	
-	virtual bool does(like_hge interface, HGECanImp<>::Magic<> ** result) {
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
 		if (HGE_LIKEA( hybridge::HGECanChip ) == interface) {
 			if (result) {
-				*result = this->trick();
+				*result = this->feat();
 			}
 			return !0;
 		} else {
-			return this->RealParent::does(interface, result);
+			return this->RealParent::canYou(interface, result);
 		}
 	}
 	
@@ -77,7 +67,7 @@ private:
 	
 public:
 	
-	typedef CircuitDerived Circuited;
+	typedef Derived Circuited;
 	typedef void * Condition;
 	typedef bool (Circuited::*Matcher)(MagicCircuit::Condition condition, Circuited ** result);
 	
@@ -236,7 +226,7 @@ private:
 	
 public:
 	
-	HGECanCircuit() : magic(this), favorite(this) , popularity(0) {}
+	HGECanCircuit() : magic(static_cast<MagicDerived *>(this)), favorite(this) , popularity(0) {}
 	~HGECanCircuit() {
 		LoopCheckCount count = 0;
 		

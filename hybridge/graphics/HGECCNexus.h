@@ -10,7 +10,8 @@
 #define __HGECCNEXUS_H__
 
 #include "core/HGEDoer.h"
-#include "service/HGERouter.h"
+#include "core/can/HGECanConnect.h"
+#include "core/can/HGECanJott.h"
 
 #include "include/cocos2d.h"
 
@@ -20,29 +21,13 @@ typedef int depth_nexus;
 typedef int key_nexus;
 
 class HGECCNexus : public
-HGEOnline <
-HGECanRout <
-HGEEntity > > {
+HGECanRout < HGECCNexus,
+HGECanJott < HGECCNexus,
+HGECanConnect < HGECCNexus,
+HGECanImp < HGECCNexus,
+HGEEntity > > > > {
 	
 public:
-	
-	virtual bool is(kind_hge concrete, MagicBlack::MagicDerived ** result) {
-		if (HGE_KINDOF( HGECCNexus ) == concrete) {
-			if (result) {
-				*result = this;
-			}
-			return !0;
-		} else {
-			HGEEntity * fallback = 0;
-			if (this->HGEEntity::is(concrete, &fallback)) {
-				if (result) {
-					*result = this;
-				}
-				return !0;
-			}
-		}
-		return 0;
-	}
 	
 protected:
 	
@@ -60,9 +45,10 @@ protected:
 	
 public:
 	
-	HGECCNexus(MagicOnline::NameServer * ns)
+	HGECCNexus(MagicOnline::NameServer * ns, MagicJotter::Producer * p)
 	//: HGEEntity()
 	{
+		this->MagicJotter::producer = p;
 		this->MagicOnline::bdns = ns;
 		this->cc.node = 0;
 		this->ccelevation = 0;
@@ -110,6 +96,7 @@ protected:
 		cocos2d::CCSprite * sprite;
 		cocos2d::CCLayer * layer;
 		cocos2d::CCScene * scene;
+		cocos2d::CCSpriteBatchNode * batch;
 	};
 	cctype cc;
 	depth_nexus ccelevation;

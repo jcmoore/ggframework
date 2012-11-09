@@ -16,12 +16,11 @@
 NS_HGE_BEGIN
 
 
-template < typename Parent = HGENone >
+template < typename Derived = HGENone, typename Parent = Derived >
 class HGECanRout;
 
-
 template <>
-class HGECanRout< HGENone > {
+class HGECanRout<> {
 public:
 	
 	struct Magic : public HGECanImp<>::Magic<> {
@@ -42,25 +41,22 @@ public:
 	};
 };
 
-template < typename Parent >
+template < typename Derived, typename Parent >
 class HGECanRout : public Parent {
 public:
 	
-	typedef Parent RealParent;
-	typedef typename Parent::MagicConcrete MagicConcrete;
-	typedef typename Parent::MagicDerived MagicDerived;
 	typedef HGECanRout MagicWhite;
 	typedef HGECanRout MagicParent;
+	typedef Parent RealParent;
+	typedef Derived MagicDerived;
 	
-	struct Magic : public HGECanImp<>::Magic< MagicDerived, HGECanRout<>::Magic > {
+private:
+	typedef HGECanImp<>::Magic< MagicDerived, HGECanRout<>::Magic > Trick;
+public:
+	
+	struct Magic : public Trick {
 		
-		virtual bool does(like_hge interface, HGECanImp<>::Magic<> ** result) {
-			return this->that->does(interface, result);
-		}
-		
-		virtual bool with(kind_hge concrete, MagicDerived ** result) {
-			return this->that->is(concrete, result);
-		}
+		Magic(MagicDerived * d) : Trick(d) {};
 		
 		/**
 		 using JSON as input, destroy the entity
@@ -82,21 +78,16 @@ public:
 		virtual bool enactJSON(JSONValue& task, JSONValue& json, bool firstResponder) {
 			return this->that->enactJSON(task, json, firstResponder);
 		}
-		
-		Magic(MagicWhite * t) : that(t) {}
-		
-	private:
-		MagicWhite * that;
 	};
 	
-	virtual bool does(like_hge interface, HGECanImp<>::Magic<> ** result) {
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
 		if (HGE_LIKEA( hybridge::HGECanRout ) == interface) {
 			if (result) {
-				*result = this->trick();
+				*result = this->feat();
 			}
 			return !0;
 		} else {
-			return this->RealParent::does(interface, result);
+			return this->RealParent::canYou(interface, result);
 		}
 	}
 	
@@ -115,9 +106,9 @@ public:
 	 */
 	virtual bool enactJSON(JSONValue& task, JSONValue& json, bool firstResponder) = 0;
 	
-	Magic * trick() { return &magic; }
+	Magic * feat() { return &magic; }
 	
-	HGECanRout() : magic(this) {}
+	HGECanRout() : magic(static_cast<MagicDerived *>(this)) {}
 	
 private:
 	
