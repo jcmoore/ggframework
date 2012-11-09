@@ -14,7 +14,6 @@
 
 
 #include "service/HGEJSON.h"
-#include "service/HGEInterface.h"
 
 NS_HGE_BEGIN
 
@@ -52,12 +51,13 @@ void HGEPlatformTerminal::bridgeInput() {
 	this->interface->flushMessage(stream);
 	
 	std::string nacl = stream.GetString();
-	nacl.insert(0, "hybridge: ");
+	//nacl.insert(0, "hybridge: ");
 	
 	m_ppInstance->PostMessage(pp::Var(nacl.c_str()));
 }
 
 void HGEPlatformTerminal::bridgeOutput(std::string const& message) {
+	
 	if (!message.empty()) {
 		{
 			HGEMutex::Lock lock(this->mutex);
@@ -91,7 +91,7 @@ void HGETerminal::loadApp(const char * path) {
 
 void HGETerminal::interfaceWithClient(void * client) {
 	HGEDeleteNull(this->interface);
-	this->interface = new HGEInterface(client);
+	this->interface = HGERunLoop::sharedRunLoop()->attach(client);
 }
 
 void HGETerminal::bridgeInputAndOutput() {

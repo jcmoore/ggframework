@@ -4,6 +4,7 @@
 #include "reader.h"
 #include "internal/strfunc.h"
 
+#include <cstdarg>
 #include <string>
 #include <list>
 #include <map>

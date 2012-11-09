@@ -20,8 +20,6 @@
 
 NS_HGE_BEGIN
 
-class HGEInterface;
-
 class HGEPlatformTerminal : public HGETerminal {
 	
 	typedef std::deque< std::string > MessageQueue;
