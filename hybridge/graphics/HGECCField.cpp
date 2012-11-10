@@ -35,9 +35,9 @@ private:
 
 class FieldInputLayer : public CCLayer {
 public:
-	FieldInputLayer(HGECCField * f)
+	FieldInputLayer(HGECanJott<>::Magic * j)
 	: CCLayer()
-	, field(f) {
+	, jotter(j) {
 	}
 	
 	typedef CCPrimitive<timeSD_hge> PrimitiveTime;
@@ -87,7 +87,7 @@ public:
 		message.AddMember("data", list);
 		message.AddMember("meta", 1 * count);
 		
-		this->field->produce(message, 0);
+		this->jotter->jott(message, 0);
 	}
 	
     virtual void ccTouchesMoved(CCSet * touches, CCEvent * event) {
@@ -136,7 +136,7 @@ public:
 		message.AddMember("data", list);
 		message.AddMember("meta", 0 * count);
 		
-		this->field->produce(message, 0);
+		this->jotter->jott(message, 0);
 	}
 	
     virtual void ccTouchesEnded(CCSet * touches, CCEvent * event) {
@@ -185,7 +185,7 @@ public:
 		message.AddMember("data", list);
 		message.AddMember("meta", -1 * count);
 		
-		this->field->produce(message, 0);
+		this->jotter->jott(message, 0);
 	}
 	
     virtual void ccTouchesCancelled(CCSet * touches, CCEvent * event) {
@@ -234,7 +234,7 @@ public:
 		message.AddMember("data", list);
 		message.AddMember("meta", -1 * count);
 		
-		this->field->produce(message, 0);
+		this->jotter->jott(message, 0);
 	}
 	
 	timeSD_hge timeForTouch(int id, timeSD_hge fallback) {
@@ -265,7 +265,7 @@ public:
 		t->release();
 	}
 	
-	HGECCField * field;
+	HGECanJott<>::Magic * jotter;
 	
 	CCDictionary inputTimes;
 };
@@ -290,7 +290,7 @@ bool HGECCField::createJSON(JSONValue& json, bool firstResponder)
 	if (json.IsObject()) {
 		if (firstResponder) {
 			HGEAssertC(!this->cc.layer, "leaking");
-			this->cc.layer = new FieldInputLayer(this);
+			this->cc.layer = new FieldInputLayer(this->tasker.feat());
 			this->cc.layer->init();
 			this->cc.layer->setTouchEnabled(!0);
 			didCreate = !0;

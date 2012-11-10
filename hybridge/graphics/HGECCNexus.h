@@ -22,10 +22,24 @@ typedef int key_nexus;
 
 class HGECCNexus : public
 HGECanRout < HGECCNexus,
-HGECanJott < HGECCNexus,
-HGECanConnect < HGECCNexus,
 HGECanImp < HGECCNexus,
-HGEEntity > > > > {
+HGEEntity > > {
+	
+protected:
+	
+	typedef
+	HGECanConnect <
+	HGECanImp <
+	HGEEntity > >
+	Online;
+	Online online;
+	
+	typedef
+	HGECanJott <
+	HGECanImp <
+	HGEEntity > >
+	Jotter;
+	Jotter jotter;
 	
 public:
 	
@@ -45,11 +59,11 @@ protected:
 	
 public:
 	
-	HGECCNexus(MagicOnline::NameServer * ns, MagicJotter::Producer * p)
+	HGECCNexus(Jotter::Publisher * p, Online::NameServer * ns)
+	: online(ns)
+	, jotter(p)
 	//: HGEEntity()
 	{
-		this->MagicJotter::producer = p;
-		this->MagicOnline::bdns = ns;
 		this->cc.node = 0;
 		this->ccelevation = 0;
 	};

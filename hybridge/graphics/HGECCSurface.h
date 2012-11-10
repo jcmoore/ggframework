@@ -43,8 +43,8 @@ protected:
 	}
 public:
 	
-	HGECCSurface(MagicOnline::NameServer * ns, MagicJotter::Producer * p)
-	: HGECCNexus(ns, p) {};
+	HGECCSurface(Jotter::Publisher * p, Online::NameServer * ns)
+	: HGECCNexus(p, ns) {};
 	
 	/**
 	 using JSON as input, destroy the entity

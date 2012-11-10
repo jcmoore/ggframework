@@ -40,19 +40,20 @@ public:
 	typedef HGECanChip MagicParent;
 	typedef Derived MagicDerived;
 	typedef Parent RealParent;
+	typedef HGECanChip RealSelf;
 	
 private:
-	typedef HGECanImp<>::Magic< MagicDerived, HGECanChip<>::Magic > Trick;
+	typedef HGECanImp<>::Magic< RealSelf, HGECanChip<>::Magic > Trick;
 public:
 	
 	struct Magic : public Trick {
-		Magic(MagicDerived * d) : Trick(d) {}
+		Magic(RealSelf * d) : Trick(d) {}
 	};
 	
 	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
 		if (HGE_LIKEA( hybridge::HGECanChip ) == interface) {
 			if (result) {
-				*result = this->feat();
+				*result = static_cast<hybridge::HGECanChip<>::Magic *>(this->feat());
 			}
 			return !0;
 		} else {
@@ -62,7 +63,9 @@ public:
 	
 	Magic * feat() { return &magic; }
 	
-	HGECanChip() : magic(static_cast<MagicDerived *>(this)) {}
+	HGECanChip()
+	: magic(static_cast<RealSelf *>(this))
+	{}
 	
 private:
 	

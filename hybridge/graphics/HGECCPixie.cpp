@@ -236,7 +236,7 @@ bool HGECCPixie::setFabric(JSONValue const& json, bool implicit)
 		return 0;
 	}
 	
-	HGEHandler * handler = this->MagicOnline::bdns->whois(domain, port);
+	HGEHandler * handler = this->online.whois(domain, port);
 	HGECCFabric * fabric = handler ? handler->canTo<HGECCFabric>() : 0;
 	if (!fabric) {
 		HGEAssertC(implicit, "fabric could not be resolved from %li/%li (domain/id)", domain, port);

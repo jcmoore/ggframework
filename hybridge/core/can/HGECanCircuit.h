@@ -35,21 +35,22 @@ public:
 	
 	typedef HGECanCircuit MagicCircuit;
 	typedef HGECanCircuit MagicParent;
-	typedef Parent RealParent;
 	typedef Derived MagicDerived;
+	typedef Parent RealParent;
+	typedef HGECanCircuit RealSelf;
 	
 private:
-	typedef HGECanImp<>::Magic< MagicDerived, HGECanCircuit<>::Magic > Trick;
+	typedef HGECanImp<>::Magic< RealSelf, HGECanCircuit<>::Magic > Trick;
 public:
 	
 	struct Magic : public Trick {
-		Magic(MagicDerived * d) : Trick(d) {}
+		Magic(RealSelf * d) : Trick(d) {}
 	};
 	
 	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
-		if (HGE_LIKEA( hybridge::HGECanChip ) == interface) {
+		if (HGE_LIKEA( hybridge::HGECanCircuit ) == interface) {
 			if (result) {
-				*result = this->feat();
+				*result = static_cast<hybridge::HGECanCircuit<>::Magic *>(this->feat());
 			}
 			return !0;
 		} else {
@@ -57,7 +58,34 @@ public:
 		}
 	}
 	
+	Magic * feat() { return &magic; }
+	
+	HGECanCircuit()
+	: magic(static_cast<RealSelf *>(this))
+	, favorite(this)
+	, popularity(0)
+	{}
+	
+	~HGECanCircuit() {
+		LoopCheckCount count = 0;
+		
+		MagicCircuit * circuit = 0;
+		while (this != (circuit = this->favorite) &&
+			   circuit->splice(0)) {
+			if (++count > 0) {
+				delete circuit;
+			} else {
+				delete circuit;
+				HGEAssertC(0, "suspected infinite loop");
+				break;
+			}
+		}
+		HGEAssertC(this->popularity == 0, "assumption failed!");
+	}
+	
 private:
+	
+	Magic magic;
 	
 	enum {
 		FAVOR_CLIFF = 15,
@@ -67,15 +95,19 @@ private:
 	
 public:
 	
-	typedef Derived Circuited;
-	typedef void * Condition;
-	typedef bool (Circuited::*Matcher)(MagicCircuit::Condition condition, Circuited ** result);
+	typedef MagicDerived Circuited;
+	
+	template <typename Cond>
+	struct Compatibility {
+		typedef bool (Circuited::*Matcher)(Cond condition, Circuited ** result);
+	};
 	
 protected:
 	
 	typedef char LoopCheckCount;
 	
-	bool find (Matcher matcher,
+	template <typename Condition>
+	bool find (typename Compatibility<Condition>::Matcher matcher,
 			   Condition condition,
 			   Circuited ** result,
 			   MagicCircuit * first,
@@ -222,27 +254,7 @@ private:
 	MagicCircuit * favorite;
 	int popularity;
 	
-	Magic magic;
-	
 public:
-	
-	HGECanCircuit() : magic(static_cast<MagicDerived *>(this)), favorite(this) , popularity(0) {}
-	~HGECanCircuit() {
-		LoopCheckCount count = 0;
-		
-		MagicCircuit * circuit = 0;
-		while (this != (circuit = this->favorite) &&
-			   circuit->splice(0)) {
-			if (++count > 0) {
-				delete circuit;
-			} else {
-				delete circuit;
-				HGEAssertC(0, "suspected infinite loop");
-				break;
-			}
-		}
-		HGEAssertC(this->popularity == 0, "assumption failed!");
-	}
 	
 	Circuited * board (bool checkAll = !0) {
 		if (this->popularity == POPSTAR ||
@@ -273,13 +285,15 @@ public:
 		return static_cast<Circuited *>(this->favorite);
 	}
 	
-	bool integrated (Matcher matcher,
+	template <typename Condition>
+	bool integrated (typename Compatibility<Condition>::Matcher matcher,
 					 Condition conditon,
 					 Circuited ** result) {
 		return this->find(matcher, conditon, result, this, 0);
 	}
 	
-	bool unknown (Matcher matcher,
+	template <typename Condition>
+	bool unknown (typename Compatibility<Condition>::Matcher matcher,
 				  Condition conditon,
 				  Circuited ** result) {
 		return (this == this->favorite) ? 0 : this->find(matcher, conditon, result, this->favorite, this);

@@ -18,7 +18,7 @@ NS_HGE_BEGIN
 
 
 
-template < typename Derived = HGENone, typename Parent = Derived >
+template < class Derived = HGENone, typename Parent = Derived >
 class HGECanJott;
 
 
@@ -27,30 +27,36 @@ class HGECanJott<> {
 public:
 	
 	struct Magic : public HGECanImp<>::Magic<> {
+		virtual bool jott(JSONValue& json, bool purify = 0) = 0;
 	};
 };
 
-template < typename Derived, typename Parent >
+template < class Derived, typename Parent >
 class HGECanJott : public Parent {
 public:
 	
 	typedef HGECanJott MagicJotter;
 	typedef HGECanJott MagicParent;
-	typedef Parent RealParent;
 	typedef Derived MagicDerived;
+	typedef Parent RealParent;
+	typedef HGECanJott RealSelf;
 	
 private:
-	typedef HGECanImp<>::Magic< MagicDerived, HGECanJott<>::Magic > Trick;
+	typedef HGECanImp<>::Magic< RealSelf, HGECanJott<>::Magic > Trick;
 public:
 	
 	struct Magic : public Trick {
-		Magic(MagicDerived * d) : Trick(d) {}
+		Magic(RealSelf * d) : Trick(d) {}
+		
+		virtual bool jott(JSONValue& json, bool purify = 0) {
+			return this->that->jott(json, purify);
+		}
 	};
 	
 	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
 		if (HGE_LIKEA( hybridge::HGECanJott ) == interface) {
 			if (result) {
-				*result = this->feat();
+				*result = static_cast<hybridge::HGECanJott<>::Magic *>(this->feat());
 			}
 			return !0;
 		} else {
@@ -60,7 +66,10 @@ public:
 	
 	Magic * feat() { return &magic; }
 	
-	HGECanJott() : magic(static_cast<MagicDerived *>(this)) {}
+	HGECanJott()
+	: magic(imp_cast<RealSelf *>(this))
+	, publisher(0)
+	{}
 	
 private:
 	
@@ -68,18 +77,23 @@ private:
 	
 public:
 	
-	typedef HGEWorker Producer;
+	typedef HGEWorker Publisher;
 	
 	/**
 	 send json to a worker
 	 */
-	bool produce(JSONValue& json, bool purify = 0) {
-		return this->producer->produceJSON(json, purify);
+	virtual bool jott(JSONValue& json, bool purify = 0) {
+		return this->publisher->produceJSON(json, purify);
 	}
 	
-protected:
+	HGECanJott(Publisher * p)
+	: magic(imp_cast<RealSelf *>(this))
+	, publisher(p)
+	{}
 	
-	Producer * producer;
+private:
+	
+	Publisher * publisher;
 	
 };
 

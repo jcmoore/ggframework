@@ -62,66 +62,41 @@ class HGEProtoImp< void > : public HGEProtoImp< HGEPrototype > {};
 /**
  type definer and inheritance modifier
  */
-template < typename YoungestDef, typename Parent = YoungestDef >
+template < typename Derived, typename Parent = Derived >
 class HGEPublic
 : public Parent {
 public:
-	typedef YoungestDef MagicDerived;
-	typedef Parent RealParent;
-	typedef Parent MagicConcrete;
 	typedef HGEPublic MagicParent;
+	typedef Parent RealParent;
+	typedef Derived MagicDerived;
+	typedef HGEPublic RealSelf;
 };
-
-/**
- inheritance modifier only -- youngest definer is the parent
- */
-template < typename YoungestDef >
-class HGEPublic< YoungestDef, YoungestDef >
-: public YoungestDef {};
-
-
 
 /**
  type definer and inheritance modifier
  */
-template < typename YoungestDef, typename Parent = YoungestDef >
+template < typename Derived, typename Parent = Derived >
 class HGEProtected
 : protected Parent {
 public:
-	typedef YoungestDef MagicDerived;
-	typedef Parent RealParent;
-	typedef Parent MagicConcrete;
 	typedef HGEProtected MagicParent;
+	typedef Parent RealParent;
+	typedef Derived MagicDerived;
+	typedef HGEProtected RealSelf;
 };
-
-/**
- inheritance modifier only -- youngest definer is the parent
- */
-template < typename YoungestDef >
-class HGEProtected< YoungestDef, YoungestDef >
-: protected YoungestDef {};
-
-
 
 /**
  type definer and inheritance modifier
  */
-template < typename YoungestDef, typename Parent = YoungestDef >
+template < typename Derived, typename Parent = Derived >
 class HGEPrivate
 : private Parent {
 public:
-	typedef YoungestDef MagicDerived;
-	typedef Parent RealParent;
-	typedef Parent MagicConcrete;
 	typedef HGEPrivate MagicParent;
+	typedef Parent RealParent;
+	typedef Derived MagicDerived;
+	typedef HGEPrivate RealSelf;
 };
-
-/**
- inheritance modifier only -- youngest definer is the parent
- */
-template < typename YoungestDef >
-class HGEPrivate< YoungestDef, YoungestDef >
-: private YoungestDef {};
 
 
 
@@ -130,145 +105,40 @@ class HGEPrivate< YoungestDef, YoungestDef >
 /**
  type definer and inheritance modifier
  */
-template < typename YoungestDef, typename Parent = YoungestDef >
+template < typename Derived, typename Parent = Derived >
 class HGEVirtualPublic
 : virtual public Parent {
 public:
-	typedef YoungestDef MagicDerived;
-	typedef Parent RealParent;
-	typedef Parent MagicConcrete;
 	typedef HGEVirtualPublic MagicParent;
+	typedef Parent RealParent;
+	typedef Derived MagicDerived;
+	typedef HGEVirtualPublic RealSelf;
 };
-
-/**
- inheritance modifier only -- youngest definer is the parent
- */
-template < typename YoungestDef >
-class HGEVirtualPublic< YoungestDef, YoungestDef >
-: virtual public YoungestDef {};
-
-
 
 /**
  type definer and inheritance modifier
  */
-template < typename YoungestDef, typename Parent = YoungestDef >
+template < typename Derived, typename Parent = Derived >
 class HGEVirtualProtected
 : virtual protected Parent {
 public:
-	typedef YoungestDef MagicDerived;
-	typedef Parent RealParent;
-	typedef Parent MagicConcrete;
 	typedef HGEVirtualProtected MagicParent;
+	typedef Parent RealParent;
+	typedef Derived MagicDerived;
+	typedef HGEVirtualProtected RealSelf;
 };
-
-/**
- inheritance modifier only -- youngest definer is the parent
- */
-template < typename YoungestDef >
-class HGEVirtualProtected< YoungestDef, YoungestDef >
-: virtual protected YoungestDef {};
-
-
 
 /**
  type definer and inheritance modifier
  */
-template < typename YoungestDef, typename Parent = YoungestDef >
+template < typename Derived, typename Parent = Derived >
 class HGEVirtualPrivate
 : virtual private Parent {
 public:
-	typedef YoungestDef MagicDerived;
+	typedef HGEVirtualPrivate MagicParent;
 	typedef Parent RealParent;
-	typedef Parent MagicConcrete;
-	typedef HGEVirtualPrivate MagicParent;
-};
-
-/**
- inheritance modifier only -- youngest definer is the parent
- */
-template < typename YoungestDef >
-class HGEVirtualPrivate< YoungestDef, YoungestDef >
-: virtual private YoungestDef {};
-
-
-
-
-
-
-
-
-template <>
-class HGEPublic< void > {
-public:
-	HGEPublic() {}
-	virtual ~HGEPublic() {}
-	typedef HGEPublic MagicParent;
-	typedef HGEPublic MagicConcrete;
-};
-
-/**
- type definer only -- no parent (the following templates differ in name only)
- */
-
-template < typename YoungestDef >
-class HGEPublic< YoungestDef, HGENone >
-: public HGEPublic< void > {
-public:
-	typedef YoungestDef MagicDerived;
-	typedef HGEPublic< void > RealParent;
-	typedef typename RealParent::MagicConcrete MagicConcrete;
-	typedef HGEPublic MagicParent;
-};
-
-template < typename YoungestDef >
-class HGEProtected< YoungestDef, HGENone >
-: protected HGEPublic< void > {
-public:
-	typedef YoungestDef MagicDerived;
-	typedef HGEPublic< void > RealParent;
-	typedef typename RealParent::MagicConcrete MagicConcrete;
-	typedef HGEProtected MagicParent;
-};
-
-template < typename YoungestDef >
-class HGEPrivate< YoungestDef, HGENone >
-: private HGEPublic< void > {
-public:
-	typedef YoungestDef MagicDerived;
-	typedef HGEPublic< void > RealParent;
-	typedef typename RealParent::MagicConcrete MagicConcrete;
-	typedef HGEPrivate MagicParent;
-};
-
-template < typename YoungestDef >
-class HGEVirtualPublic< YoungestDef, HGENone >
-: virtual public HGEPublic< void > {
-public:
-	typedef YoungestDef MagicDerived;
-	typedef HGEPublic< void > RealParent;
-	typedef typename RealParent::MagicConcrete MagicConcrete;
-	typedef HGEVirtualPublic MagicParent;
-};
-
-template < typename YoungestDef >
-class HGEVirtualProtected< YoungestDef, HGENone >
-: virtual protected HGEPublic< void > {
-public:
-	typedef YoungestDef MagicDerived;
-	typedef HGEPublic< void > RealParent;
-	typedef typename RealParent::MagicConcrete MagicConcrete;
-	typedef HGEVirtualProtected MagicParent;
-};
-
-template < typename YoungestDef >
-class HGEVirtualPrivate< YoungestDef, HGENone >
-: virtual private HGEPublic< void > {
-public:
-	typedef YoungestDef MagicDerived;
-	typedef HGEPublic< void > RealParent;
-	typedef typename RealParent::MagicConcrete MagicConcrete;
-	typedef HGEVirtualPrivate MagicParent;
+	typedef Derived MagicDerived;
+	typedef HGEVirtualPrivate RealSelf;
 };
 
 

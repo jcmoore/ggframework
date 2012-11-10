@@ -10,11 +10,29 @@
 #define __HGECCFIELD_H__
 
 #include "graphics/HGECCNexus.h"
+#include "core/can/HGECanIdentify.h"
+#include "core/can/HGECanTask.h"
 
 NS_HGE_BEGIN
 
 class HGECCField : public
 HGECCNexus {
+	
+protected:
+	
+	typedef
+	HGECanIdentify <
+	HGECanImp <
+	HGEEntity > >
+	Identity;
+	Identity identity;
+	
+	typedef
+	HGECanTask <
+	HGECanImp <
+	HGEEntity > >
+	Tasker;
+	Tasker tasker;
 	
 public:
 	
@@ -44,8 +62,14 @@ protected:
 	}
 public:
 	
-	HGECCField(MagicOnline::NameServer * ns, MagicJotter::Producer * p)
-	: HGECCNexus(ns, p) {};
+	HGECCField(HGEBottomLevelDomainName bldn,
+			   HGEPortNumber port,
+			   Jotter::Publisher * p,
+			   Online::NameServer * ns)
+	: HGECCNexus(p, ns)
+	, identity(bldn, port)
+	, tasker(this->jotter.feat(), this->identity.feat())
+	{};
 	
 	/**
 	 using JSON as input, destroy the entity

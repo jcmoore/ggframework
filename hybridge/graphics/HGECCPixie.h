@@ -46,8 +46,8 @@ protected:
 	}
 public:
 	
-	HGECCPixie(MagicOnline::NameServer * ns, MagicJotter::Producer * p)
-	: HGECCNexus(ns, p)
+	HGECCPixie(Jotter::Publisher * p, Online::NameServer * ns)
+	: HGECCNexus(p, ns)
 	, fabricRef() {};
 	
 	/**

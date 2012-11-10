@@ -19,7 +19,7 @@
 
 NS_HGE_BEGIN
 
-
+#define imp_cast		static_cast
 
 template < typename Derived = HGENone, typename Parent = HGENone >
 class HGECanImp;
@@ -30,6 +30,7 @@ public:
 	
 	template < typename MagicDerived = void, typename DeepMagic = void >
 	struct Magic;
+	
 };
 
 // type-interface
@@ -83,13 +84,23 @@ struct HGECanImp<>::Magic< MagicDerived > : public HGECanImp<>::Magic<> {
 private:
 	
 	virtual bool how(HGECanImp<>::Magic<> * result) {
-		return 0;
+		if (result) {
+			static_cast< HGECanImp<>::Magic<MagicDerived> * >(result)->that = this->that;
+		}
+		return !0;
 	}
 	
 public:
 	
 	virtual bool canDo(like_hge interface, HGECanImp<>::Magic<> ** result) {
-		return 0;
+		if (HGE_LIKEA( hybridge::HGECanImp ) == interface) {
+			if (result) {
+				*result = static_cast<hybridge::HGECanImp<>::Magic<> *>(this);
+			}
+			return !0;
+		} else {
+			return 0;
+		}
 	}
 	
 	virtual bool with(kind_hge concrete, MagicDerived ** result) {
@@ -112,9 +123,8 @@ private:
 	virtual bool how(HGECanImp<>::Magic<> * result) {
 		if (result) {
 			static_cast< HGECanImp<>::Magic<MagicDerived> * >(result)->that = this->that;
-			return !0;
 		}
-		return 0;
+		return !0;
 	};
 	
 public:
@@ -122,9 +132,9 @@ public:
 	virtual bool canDo(like_hge interface, HGECanImp<>::Magic<> ** result) {
 		if (HGE_LIKEA( hybridge::HGECanImp ) == interface) {
 			if (result) {
-				*result = this;
+				*result = static_cast<hybridge::HGECanImp<>::Magic<> *>(this);
 			}
-			return this;
+			return !0;
 		} else {
 			return this->that->canYou(interface, result);
 		}
@@ -151,8 +161,9 @@ class HGECanImp< Derived, HGENone> {
 public:
 	typedef HGECanImp MagicBlack;
 	typedef HGECanImp MagicParent;
-	typedef HGENone RealParent;
 	typedef Derived MagicDerived;
+	typedef HGENone RealParent;
+	typedef HGECanImp RealSelf;
 	
 	template <typename HiddenMagic>
 	struct DeepMagic : public HiddenMagic {
@@ -162,18 +173,18 @@ public:
 	typedef DeepMagic< HGECanImp<>::Magic<> > OtherMagic;
 	
 private:
-	typedef HGECanImp<>::Magic< MagicDerived, HGECanImp<>::Magic<> > Trick;
+	typedef HGECanImp<>::Magic< RealSelf, HGECanImp<>::Magic<> > Trick;
 public:
 	
 	struct Magic : public Trick {
-		Magic(MagicDerived * d) : Trick(d) {}
+		Magic(RealSelf * d) : Trick(d) {}
 		
 	};
 	
 	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
 		if (HGE_LIKEA( hybridge::HGECanImp ) == interface) {
 			if (result) {
-				*result = this->feat();
+				*result = imp_cast<hybridge::HGECanImp<>::Magic<> *>(this->feat());
 			}
 			return !0;
 		} else {
@@ -184,7 +195,7 @@ public:
 	virtual bool areYou(kind_hge concrete, MagicDerived ** result) {
 		if (HGE_KINDOF( MagicDerived ) == concrete) {
 			if (result) {
-				*result = static_cast<MagicDerived *>(this);
+				*result = imp_cast<MagicDerived *>(this);
 			}
 			return !0;
 		} else {
@@ -194,7 +205,9 @@ public:
 	
 	Magic * feat() { return &magic; }
 	
-	HGECanImp() : magic(static_cast<MagicDerived *>(this)) {}
+	HGECanImp()
+	: magic(static_cast<RealSelf *>(this))
+	{}
 	
 private:
 	
@@ -207,21 +220,22 @@ class HGECanImp : public Parent {
 public:
 	typedef HGECanImp MagicBlack;
 	typedef HGECanImp MagicParent;
-	typedef Parent RealParent;
 	typedef Derived MagicDerived;
+	typedef Parent RealParent;
+	typedef HGECanImp RealSelf;
 	
 private:
-	typedef HGECanImp<>::Magic< MagicDerived, HGECanImp<>::Magic<> > Trick;
+	typedef HGECanImp<>::Magic< RealSelf, HGECanImp<>::Magic<> > Trick;
 public:
 	
 	struct Magic : public Trick {
-		Magic(MagicDerived * d) : Trick(d) {}
+		Magic(RealSelf * d) : Trick(d) {}
 	};
 	
 	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
 		if (HGE_LIKEA( hybridge::HGECanImp ) == interface) {
 			if (result) {
-				*result = this->feat();
+				*result = imp_cast<hybridge::HGECanImp<>::Magic<> *>(this->feat());
 			}
 			return !0;
 		} else {
@@ -232,7 +246,7 @@ public:
 	virtual bool areYou(kind_hge concrete, MagicDerived ** result) {
 		if (HGE_KINDOF( MagicDerived ) == concrete) {
 			if (result) {
-				*result = static_cast<MagicDerived *>(this);
+				*result = imp_cast<MagicDerived *>(this);
 			}
 			return !0;
 		} else {
@@ -240,7 +254,7 @@ public:
 			MagicConverter * converter = 0;
 			if (RealParent::areYou(concrete, (result ? &converter : 0))) {
 				if (result) {
-					*result = static_cast< MagicDerived * >(this);
+					*result = imp_cast< MagicDerived * >(this);
 				}
 				return !0;
 			} else {
@@ -251,7 +265,9 @@ public:
 	
 	Magic * feat() { return &magic; }
 	
-	HGECanImp() : magic(static_cast<MagicDerived *>(this)) {}
+	HGECanImp()
+	: magic(imp_cast<RealSelf *>(this))
+	{}
 	
 private:
 	

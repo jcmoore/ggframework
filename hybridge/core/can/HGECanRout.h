@@ -47,16 +47,17 @@ public:
 	
 	typedef HGECanRout MagicWhite;
 	typedef HGECanRout MagicParent;
-	typedef Parent RealParent;
 	typedef Derived MagicDerived;
+	typedef Parent RealParent;
+	typedef HGECanRout RealSelf;
 	
 private:
-	typedef HGECanImp<>::Magic< MagicDerived, HGECanRout<>::Magic > Trick;
+	typedef HGECanImp<>::Magic< RealSelf, HGECanRout<>::Magic > Trick;
 public:
 	
 	struct Magic : public Trick {
 		
-		Magic(MagicDerived * d) : Trick(d) {};
+		Magic(RealSelf * d) : Trick(d) {};
 		
 		/**
 		 using JSON as input, destroy the entity
@@ -83,7 +84,7 @@ public:
 	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
 		if (HGE_LIKEA( hybridge::HGECanRout ) == interface) {
 			if (result) {
-				*result = this->feat();
+				*result = static_cast<hybridge::HGECanRout<>::Magic *>(this->feat());
 			}
 			return !0;
 		} else {
@@ -108,7 +109,9 @@ public:
 	
 	Magic * feat() { return &magic; }
 	
-	HGECanRout() : magic(static_cast<MagicDerived *>(this)) {}
+	HGECanRout()
+	: magic(imp_cast<RealSelf *>(this))
+	{}
 	
 private:
 	

@@ -33,21 +33,22 @@ public:
 	
 	typedef HGECanConnect MagicOnline;
 	typedef HGECanConnect MagicParent;
-	typedef Parent RealParent;
 	typedef Derived MagicDerived;
+	typedef Parent RealParent;
+	typedef HGECanConnect RealSelf;
 	
 private:
-	typedef HGECanImp<>::Magic< MagicDerived, HGECanConnect<>::Magic > Trick;
+	typedef HGECanImp<>::Magic< RealSelf, HGECanConnect<>::Magic > Trick;
 public:
 	
 	struct Magic : public Trick {
-		Magic(MagicDerived * d) : Trick(d) {}
+		Magic(RealSelf * d) : Trick(d) {}
 	};
 	
 	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
 		if (HGE_LIKEA( hybridge::HGECanConnect ) == interface) {
 			if (result) {
-				*result = this->feat();
+				*result = static_cast<hybridge::HGECanConnect<>::Magic *>(this->feat());
 			}
 			return !0;
 		} else {
@@ -57,7 +58,9 @@ public:
 	
 	Magic * feat() { return &magic; }
 	
-	HGECanConnect() : magic(static_cast<MagicDerived *>(this)),  bdns(0) {}
+	HGECanConnect()
+	: magic(static_cast<RealSelf *>(this)),  bdns(0)
+	{}
 	
 private:
 	
@@ -67,7 +70,15 @@ public:
 	
 	typedef HGERouter::BottomLevelNameServerInterface NameServer;
 	
-	virtual void call () {}
+	virtual HGEHandler * whois(HGEBottomLevelDomainName bldn, HGEPortNumber port) {
+		return this->bdns->whois(bldn, port);
+	}
+	
+	
+	HGECanConnect(NameServer * ns)
+	: magic(static_cast<RealSelf *>(this))
+	, bdns(ns)
+	{}
 	
 protected:
 	

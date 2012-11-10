@@ -11,16 +11,40 @@
 
 #include "core/can/HGECanRout.h"
 #include "core/can/HGECanJott.h"
+#include "core/can/HGECanIdentify.h"
+#include "core/can/HGECanTask.h"
 
 #include "include/cocos2d.h"
 
 NS_HGE_BEGIN
 
 class HGECCFabric : public
-HGECanJott < HGECCFabric,
 HGECanRout < HGECCFabric,
 HGECanImp < HGECCFabric,
-HGEEntity > > > {
+HGEEntity > > {
+	
+protected:
+	
+	typedef
+	HGECanJott <
+	HGECanImp < 
+	HGEEntity > >
+	Jotter;
+	Jotter jotter;
+	
+	typedef
+	HGECanIdentify <
+	HGECanImp <
+	HGEEntity > >
+	Identity;
+	Identity identity;
+	
+	typedef 
+	HGECanTask <
+	HGECanImp <
+	HGEEntity > >
+	Tasker;
+	Tasker tasker;
 	
 public:
 	
@@ -40,10 +64,13 @@ protected:
 	
 public:
 	
-	HGECCFabric(MagicJotter::Producer * p)
-	//: HGEEntity()
+	HGECCFabric(HGEBottomLevelDomainName bldn,
+				HGEPortNumber port,
+				Jotter::Publisher * p)
+	: jotter(p)
+	, identity(bldn, port)
+	, tasker(this->jotter.feat(), this->identity.feat())
 	{
-		this->MagicJotter::producer = p;
 		this->cc.texture = 0;
 		this->cccahced = 0;
 	};
@@ -79,6 +106,8 @@ protected:
 	
 	cctype cc;
 	unsigned char cccahced;
+private:
+	
 };
 
 NS_HGE_END

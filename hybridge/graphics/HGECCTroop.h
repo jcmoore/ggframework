@@ -46,8 +46,8 @@ protected:
 	}
 public:
 	
-	HGECCTroop(MagicOnline::NameServer * ns, MagicJotter::Producer * p)
-	: HGECCNexus(ns, p)
+	HGECCTroop(Jotter::Publisher * p, Online::NameServer * ns)
+	: HGECCNexus(p, ns)
 	, fabricRef() {};
 	
 	/**
