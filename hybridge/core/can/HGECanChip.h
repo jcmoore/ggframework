@@ -50,21 +50,28 @@ public:
 		Magic(RealSelf * d) : Trick(d) {}
 	};
 	
-	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result, HGECantImp * compositExclusion) {
 		if (HGE_LIKEA( hybridge::HGECanChip ) == interface) {
 			if (result) {
 				*result = static_cast<hybridge::HGECanChip<>::Magic *>(this->feat());
 			}
 			return !0;
 		} else {
-			return this->RealParent::canYou(interface, result);
+			return this->RealParent::canYou(interface, result, compositExclusion);
 		}
 	}
 	
 	Magic * feat() { return &magic; }
 	
 	HGECanChip()
-	: magic(static_cast<RealSelf *>(this))
+	: Parent()
+	, magic(static_cast<RealSelf *>(this))
+	{}
+	
+	template <typename Delegate>
+	HGECanChip(Delegate * delegate = 0)
+	: Parent(delegate)
+	, magic(static_cast<RealSelf *>(this))
 	{}
 	
 private:

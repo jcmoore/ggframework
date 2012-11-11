@@ -25,10 +25,10 @@ class HGECanIdentify;
 template <>
 class HGECanIdentify<> {
 public:
-	typedef HGEPortNumber PortNumber;
-	typedef HGEBottomLevelDomainName DomainName;
-	
 	struct Magic : public HGECanImp<>::Magic<> {
+		typedef HGEPortNumber PortNumber;
+		typedef HGEBottomLevelDomainName DomainName;
+		
 		virtual PortNumber getPortNumber() = 0;
 		virtual DomainName getDomainName() = 0;
 	};
@@ -44,8 +44,8 @@ public:
 	typedef Parent RealParent;
 	typedef HGECanIdentify RealSelf;
 	
-	typedef HGECanIdentify<>::PortNumber PortNumber;
-	typedef HGECanIdentify<>::DomainName DomainName;
+	typedef HGECanIdentify<>::Magic::PortNumber PortNumber;
+	typedef HGECanIdentify<>::Magic::DomainName DomainName;
 	
 private:
 	typedef HGECanImp<>::Magic< RealSelf, HGECanIdentify<>::Magic > Trick;
@@ -62,21 +62,28 @@ public:
 		}
 	};
 	
-	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result, HGECantImp * compositExclusion) {
 		if (HGE_LIKEA( hybridge::HGECanIdentify ) == interface) {
 			if (result) {
 				*result = static_cast<hybridge::HGECanIdentify<>::Magic *>(this->feat());
 			}
 			return !0;
 		} else {
-			return this->RealParent::canYou(interface, result);
+			return this->RealParent::canYou(interface, result, compositExclusion);
 		}
 	}
 	
 	Magic * feat() { return &magic; }
 	
 	HGECanIdentify()
-	: magic(imp_cast<RealSelf *>(this))
+	: Parent()
+	, magic(imp_cast<RealSelf *>(this))
+	{}
+	
+	template <typename Delegate>
+	HGECanIdentify(Delegate * delegate = 0)
+	: Parent(delegate)
+	, magic(imp_cast<RealSelf *>(this))
 	{}
 	
 private:
@@ -93,7 +100,16 @@ public:
 	}
 	
 	HGECanIdentify(DomainName dn, PortNumber pn)
-	: magic(imp_cast<RealSelf *>(this))
+	: Parent()
+	, magic(imp_cast<RealSelf *>(this))
+	, domainName(dn)
+	, portNumber(pn)
+	{}
+	
+	template <typename Delegate>
+	HGECanIdentify(DomainName dn, PortNumber pn, Delegate * delegate = 0)
+	: Parent(delegate)
+	, magic(imp_cast<RealSelf *>(this))
 	, domainName(dn)
 	, portNumber(pn)
 	{}

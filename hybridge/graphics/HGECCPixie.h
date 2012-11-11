@@ -20,7 +20,7 @@ class HGECCPixie : public HGECCNexus {
 	
 public:
 	
-	virtual bool areYou(kind_hge concrete, MagicBlack::MagicDerived ** result) {
+	virtual bool areYou(kind_hge concrete, MagicImp::MagicDerived ** result) {
 		if (HGE_KINDOF( HGECCPixie ) == concrete) {
 			if (result) {
 				*result = this;

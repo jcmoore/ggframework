@@ -1,13 +1,13 @@
 //
-//  HGECCField.h
+//  HGECCZone.h
 //  hybridge
 //
 //  Created by The Narrator on 10/28/12.
 //
 //
 
-#ifndef __HGECCFIELD_H__
-#define __HGECCFIELD_H__
+#ifndef __HGECCZONE_H__
+#define __HGECCZONE_H__
 
 #include "graphics/HGECCNexus.h"
 #include "core/can/HGECanIdentify.h"
@@ -15,7 +15,7 @@
 
 NS_HGE_BEGIN
 
-class HGECCField : public
+class HGECCZone : public
 HGECCNexus {
 	
 protected:
@@ -23,21 +23,36 @@ protected:
 	typedef
 	HGECanIdentify <
 	HGECanImp <
-	HGEEntity > >
+	MagicImp::MagicDerived > >
 	Identity;
 	Identity identity;
 	
 	typedef
 	HGECanTask <
 	HGECanImp <
-	HGEEntity > >
+	MagicImp::MagicDerived > >
 	Tasker;
 	Tasker tasker;
 	
 public:
 	
-	virtual bool areYou(kind_hge concrete, MagicBlack::MagicDerived ** result) {
-		if (HGE_KINDOF( HGECCField ) == concrete) {
+	/**
+	 composite imps should impliment this
+	 */
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result, HGECantImp * compositExclusion) {
+		if ((HGECantImp *)(&this->tasker) != compositExclusion &&
+			this->tasker.canYou(interface, result, this)) {
+			return !0;
+		} else if ((HGECantImp *)(&this->identity) != compositExclusion &&
+				   this->identity.canYou(interface, result, this)){
+			return !0;
+		} else {
+			return MagicParent::canYou(interface, result, compositExclusion);
+		}
+	}
+	
+	virtual bool areYou(kind_hge concrete, MagicImp::MagicDerived ** result) {
+		if (HGE_KINDOF( HGECCZone ) == concrete) {
 			if (result) {
 				*result = this;
 			}
@@ -50,7 +65,7 @@ public:
 protected:
 	
 	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
-		if (kind_hge(condition) == HGE_KINDOF( HGECCField ) ||
+		if (kind_hge(condition) == HGE_KINDOF( HGECCZone ) ||
 			HGECCNexus::beKind(condition, result)) {
 			if (result) {
 				*result = this;
@@ -62,13 +77,13 @@ protected:
 	}
 public:
 	
-	HGECCField(HGEBottomLevelDomainName bldn,
+	HGECCZone(HGEBottomLevelDomainName bldn,
 			   HGEPortNumber port,
 			   Jotter::Publisher * p,
 			   Online::NameServer * ns)
 	: HGECCNexus(p, ns)
-	, identity(bldn, port)
-	, tasker(this->jotter.feat(), this->identity.feat())
+	, identity(bldn, port, this)
+	, tasker(this->jotter.feat(), this->identity.feat(), this)
 	{};
 	
 	/**

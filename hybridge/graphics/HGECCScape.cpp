@@ -1,12 +1,12 @@
 //
-//  HGECCSurface.cpp
+//  HGECCScape.cpp
 //  hybridge
 //
 //  Created by The Narrator on 10/28/12.
 //
 //
 
-#include "graphics/HGECCSurface.h"
+#include "graphics/HGECCScape.h"
 
 //#include "service/HGERouter.h"
 
@@ -14,7 +14,7 @@ USING_NS_CC;
 
 NS_HGE_BEGIN
 
-bool HGECCSurface::destroyJSON(JSONValue& json, bool firstResponder)
+bool HGECCScape::destroyJSON(JSONValue& json, bool firstResponder)
 {
 	bool diDestroy = 0;
 	
@@ -27,7 +27,7 @@ bool HGECCSurface::destroyJSON(JSONValue& json, bool firstResponder)
 	return HGECCNexus::createJSON(json, firstResponder) || diDestroy;
 }
 
-bool HGECCSurface::createJSON(JSONValue& json, bool firstResponder)
+bool HGECCScape::createJSON(JSONValue& json, bool firstResponder)
 {
 	bool didCreate = 0;
 	
@@ -46,7 +46,7 @@ bool HGECCSurface::createJSON(JSONValue& json, bool firstResponder)
 	return HGECCNexus::createJSON(json, firstResponder) || didCreate;
 }
 
-bool HGECCSurface::enactJSON(JSONValue& task, JSONValue& json, bool firstResponder)
+bool HGECCScape::enactJSON(JSONValue& task, JSONValue& json, bool firstResponder)
 {
 	bool didEnact = 0;
 	
@@ -63,12 +63,12 @@ bool HGECCSurface::enactJSON(JSONValue& task, JSONValue& json, bool firstRespond
 
 
 
-bool HGECCSurface::run(JSONValue const& json, bool implicit)
+bool HGECCScape::run(JSONValue const& json, bool implicit)
 {
 	return this->run();
 }
 
-bool HGECCSurface::run()
+bool HGECCScape::run()
 {
 	CCDirector * sharedDirector = CCDirector::sharedDirector();
 	

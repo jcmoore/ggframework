@@ -22,7 +22,7 @@ NS_HGE_BEGIN
 class HGEGate : public HGEWorker {
 	
 public:
-	HGEGate(const char * a);
+	HGEGate(const char * a, bool doubleBuffered);
 	virtual ~HGEGate();
 	
 protected:
@@ -43,6 +43,8 @@ public:
 	virtual bool reportJSON(JSONValue& result);
 	
 private:
+	
+	bool isDoubleBuffered;
 	
 	JSONValue * mainQueue;
 	JSONValue * offQueue;

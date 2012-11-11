@@ -1,24 +1,24 @@
 //
-//  HGECCSurface.h
+//  HGECCScape.h
 //  hybridge
 //
 //  Created by The Narrator on 10/28/12.
 //
 //
 
-#ifndef __HGECCSURFACE_H__
-#define __HGECCSURFACE_H__
+#ifndef __HGECCSCAPE_H__
+#define __HGECCSCAPE_H__
 
 #include "graphics/HGECCNexus.h"
 
 NS_HGE_BEGIN
 
-class HGECCSurface : public HGECCNexus {
+class HGECCScape : public HGECCNexus {
 	
 public:
 	
-	virtual bool areYou(kind_hge concrete, MagicBlack::MagicDerived ** result) {
-		if (HGE_KINDOF( HGECCSurface ) == concrete) {
+	virtual bool areYou(kind_hge concrete, MagicImp::MagicDerived ** result) {
+		if (HGE_KINDOF( HGECCScape ) == concrete) {
 			if (result) {
 				*result = this;
 			}
@@ -31,7 +31,7 @@ public:
 protected:
 	
 	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
-		if (kind_hge(condition) == HGE_KINDOF( HGECCSurface ) ||
+		if (kind_hge(condition) == HGE_KINDOF( HGECCScape ) ||
 			HGECCNexus::beKind(condition, result)) {
 			if (result) {
 				*result = this;
@@ -43,7 +43,7 @@ protected:
 	}
 public:
 	
-	HGECCSurface(Jotter::Publisher * p, Online::NameServer * ns)
+	HGECCScape(Jotter::Publisher * p, Online::NameServer * ns)
 	: HGECCNexus(p, ns) {};
 	
 	/**

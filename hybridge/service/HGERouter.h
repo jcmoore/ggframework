@@ -11,7 +11,6 @@
 
 #include "service/HGEWorker.h"
 #include "util/HGEUtilString.h"
-#include "core/HGEDoer.h"
 #include "core/can/HGECanRout.h"
 
 #include <map>

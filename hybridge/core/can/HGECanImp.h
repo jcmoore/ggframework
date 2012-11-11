@@ -21,6 +21,8 @@ NS_HGE_BEGIN
 
 #define imp_cast		static_cast
 
+typedef void HGECantImp;
+
 template < typename Derived = HGENone, typename Parent = HGENone >
 class HGECanImp;
 
@@ -28,18 +30,19 @@ template <>
 class HGECanImp<> {
 public:
 	
-	template < typename MagicDerived = void, typename DeepMagic = void >
+	template < typename MagicDerived = void, typename MagicBase = void >
 	struct Magic;
 	
 };
 
-// type-interface
+
+
 template <>
 struct HGECanImp<>::Magic< void, void > {
 	
 private:
 	
-	virtual bool how(HGECanImp<>::Magic<> * result) = 0;
+	virtual HGECanImp<>::Magic<> * passTo(HGECanImp<>::Magic<> * result) = 0;
 	
 public:
 	
@@ -58,73 +61,74 @@ public:
 	
 	template < typename Destination >
 	Destination * canTo() {
-		typedef typename HGECanImp<>::Magic< Destination > Answer;
+		typedef typename HGECanImp<>::Magic< Destination > Messenger;
 		
-		Answer a;
+		Messenger courier;
 		
-		if (this->how(&a)) {
-			Destination * concrete = 0;
-			if (a.with(HGE_KINDOF(Destination), &concrete)) {
-				return concrete;
-			}
+		HGECanImp<>::Magic<> * delegator = this;
+		
+		while ((delegator = delegator->passTo(&courier))) {
+		}
+		
+		Destination * concrete = 0;
+		if (courier.sendTo(HGE_KINDOF(Destination), &concrete)) {
+			return concrete;
 		}
 		return 0;
 	}
 };
 
-// typed-interface
+// messanger interface
 template < typename MagicDerived >
 struct HGECanImp<>::Magic< MagicDerived > : public HGECanImp<>::Magic<> {
 	
 	friend class HGECanImp<>::Magic<>;
 	
-	template < typename Derived, typename Base >
+	template <typename Derived, typename Base>
 	friend class HGECanImp<>::Magic;
 	
 private:
 	
-	virtual bool how(HGECanImp<>::Magic<> * result) {
-		if (result) {
-			static_cast< HGECanImp<>::Magic<MagicDerived> * >(result)->that = this->that;
-		}
-		return !0;
+	HGECanImp<>::Magic<> * passTo(HGECanImp<>::Magic<> * result) {
+		return 0;
 	}
 	
-public:
-	
-	virtual bool canDo(like_hge interface, HGECanImp<>::Magic<> ** result) {
-		if (HGE_LIKEA( hybridge::HGECanImp ) == interface) {
-			if (result) {
-				*result = static_cast<hybridge::HGECanImp<>::Magic<> *>(this);
-			}
-			return !0;
-		} else {
-			return 0;
-		}
-	}
-	
-	virtual bool with(kind_hge concrete, MagicDerived ** result) {
+	bool sendTo(kind_hge concrete, MagicDerived ** result) {
 		return this->that ? this->that->areYou(concrete, result) : 0;
 	};
 	
+public:
+	
+	bool canDo(like_hge interface, HGECanImp<>::Magic<> ** result) {
+		return 0;
+	}
+	
+private:
 	Magic() : that(0) {}
 	
-//private:
 	MagicDerived * that;
 };
 
-template < typename MagicDerived, typename BaseMagic >
-struct HGECanImp<>::Magic : public BaseMagic {
+template < typename MagicDerived, typename MagicBase >
+struct HGECanImp<>::Magic : public MagicBase {
 	
 	friend class HGECanImp<>::Magic<>;
 	
 private:
 	
-	virtual bool how(HGECanImp<>::Magic<> * result) {
+	HGECanImp<>::Magic<> * passTo(HGECanImp<>::Magic<> * result) {
 		if (result) {
-			static_cast< HGECanImp<>::Magic<MagicDerived> * >(result)->that = this->that;
+			HGECanImp<>::Magic<> * delegateMagic = this->that->delegator();
+			if (delegateMagic &&
+				this != delegateMagic) {
+				return delegateMagic;
+			} else {
+				static_cast< HGECanImp<>::Magic<MagicDerived> * >(result)->that = this->that;
+				return 0;
+			}
+		} else {
+			return 0;
 		}
-		return !0;
 	};
 	
 public:
@@ -136,13 +140,9 @@ public:
 			}
 			return !0;
 		} else {
-			return this->that->canYou(interface, result);
+			return this->that->canYou(interface, result, 0);
 		}
 	}
-	
-	//virtual bool with(kind_hge concrete, MagicDerived ** result) {
-	//	return this->that->areYou(concrete, result);
-	//}
 	
 	Magic(MagicDerived * t) : that(t) {
 		HGEAssertC(this->that, "cannot do magic without 'that'");
@@ -155,22 +155,83 @@ protected:
 
 
 
-// void implementation
+// delegate forwarding implementation
 template < typename Derived >
 class HGECanImp< Derived, HGENone> {
 public:
-	typedef HGECanImp MagicBlack;
+	typedef HGECanImp MagicImp;
 	typedef HGECanImp MagicParent;
 	typedef Derived MagicDerived;
 	typedef HGENone RealParent;
 	typedef HGECanImp RealSelf;
+	typedef Derived FakeSelf;
 	
-	template <typename HiddenMagic>
-	struct DeepMagic : public HiddenMagic {
-		virtual bool with(kind_hge concrete, MagicDerived ** result) = 0;
+private:
+	typedef HGECanImp<>::Magic< FakeSelf, HGECanImp<>::Magic<> > Trick;
+public:
+	
+	struct Magic : public Trick {
+		Magic(FakeSelf * d) : Trick(d) {}
+		
+	private:
+		
+		friend class HGECanImp;
+		
+		bool canWe(like_hge interface,
+				   HGECanImp<>::Magic<> ** result,
+				   HGECantImp * compositExclusion,
+				   HGECanImp * inquirer) {
+			if ((HGECantImp *)this->that != compositExclusion) {
+				return this->that->canYou(interface, result, (HGECantImp *)inquirer);
+			} else {
+				return 0;
+			}
+		}
+		
 	};
 	
-	typedef DeepMagic< HGECanImp<>::Magic<> > OtherMagic;
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result, HGECantImp * compositExclusion) {
+		return this->feat()->canWe(interface, result, compositExclusion, this);
+	}
+	
+//private:
+	
+	virtual bool areYou(kind_hge concrete, MagicDerived ** result) {
+		if (result) {
+			*result = this->feat()->template canTo<MagicDerived>();
+			return !0;
+		} else {
+			return 0;
+		}
+	}
+	
+public:
+	
+	Magic * feat() { return &magic; }
+	
+	HGECanImp(MagicDerived * delegate)
+	: magic(static_cast<FakeSelf *>(delegate))
+	{}
+	
+private:
+	
+	Magic magic;
+	
+public:
+	
+	Magic * delegator() { return this->feat(); }
+	
+};
+
+// superclass implementation
+template < typename Derived >
+class HGECanImp< Derived, Derived> {
+public:
+	typedef HGECanImp MagicImp;
+	typedef HGECanImp MagicParent;
+	typedef Derived MagicDerived;
+	typedef HGENone RealParent;
+	typedef HGECanImp RealSelf;
 	
 private:
 	typedef HGECanImp<>::Magic< RealSelf, HGECanImp<>::Magic<> > Trick;
@@ -181,7 +242,7 @@ public:
 		
 	};
 	
-	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result, HGECantImp * compositExclusion) {
 		if (HGE_LIKEA( hybridge::HGECanImp ) == interface) {
 			if (result) {
 				*result = imp_cast<hybridge::HGECanImp<>::Magic<> *>(this->feat());
@@ -205,7 +266,7 @@ public:
 	
 	Magic * feat() { return &magic; }
 	
-	HGECanImp()
+	HGECanImp(MagicDerived * delegate = 0)
 	: magic(static_cast<RealSelf *>(this))
 	{}
 	
@@ -213,12 +274,19 @@ private:
 	
 	Magic magic;
 	
+public:
+	
+	Magic * delegator() { return 0; }
+	
 };
 
+
+
+// subclass implementation
 template < typename Derived, typename Parent >
 class HGECanImp : public Parent {
 public:
-	typedef HGECanImp MagicBlack;
+	typedef HGECanImp MagicImp;
 	typedef HGECanImp MagicParent;
 	typedef Derived MagicDerived;
 	typedef Parent RealParent;
@@ -232,14 +300,14 @@ public:
 		Magic(RealSelf * d) : Trick(d) {}
 	};
 	
-	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result, HGECantImp * compositExclusion) {
 		if (HGE_LIKEA( hybridge::HGECanImp ) == interface) {
 			if (result) {
 				*result = imp_cast<hybridge::HGECanImp<>::Magic<> *>(this->feat());
 			}
 			return !0;
 		} else {
-			return RealParent::canYou(interface, result);
+			return RealParent::canYou(interface, result, compositExclusion);
 		}
 	}
 	
@@ -250,7 +318,7 @@ public:
 			}
 			return !0;
 		} else {
-			typedef typename RealParent::MagicBlack::MagicDerived MagicConverter;
+			typedef typename RealParent::MagicImp::MagicDerived MagicConverter;
 			MagicConverter * converter = 0;
 			if (RealParent::areYou(concrete, (result ? &converter : 0))) {
 				if (result) {
@@ -265,13 +333,17 @@ public:
 	
 	Magic * feat() { return &magic; }
 	
-	HGECanImp()
+	HGECanImp(MagicDerived * delegate = 0)
 	: magic(imp_cast<RealSelf *>(this))
 	{}
 	
 private:
 	
 	Magic magic;
+	
+public:
+	
+	Magic * delegator() { return 0; }
 	
 };
 

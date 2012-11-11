@@ -41,6 +41,8 @@ public:
 	typedef Parent RealParent;
 	typedef HGECanJott RealSelf;
 	
+	typedef HGEWorker Publisher;
+	
 private:
 	typedef HGECanImp<>::Magic< RealSelf, HGECanJott<>::Magic > Trick;
 public:
@@ -53,22 +55,30 @@ public:
 		}
 	};
 	
-	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result, HGECantImp * compositExclusion) {
 		if (HGE_LIKEA( hybridge::HGECanJott ) == interface) {
 			if (result) {
 				*result = static_cast<hybridge::HGECanJott<>::Magic *>(this->feat());
 			}
 			return !0;
 		} else {
-			return this->RealParent::canYou(interface, result);
+			return this->RealParent::canYou(interface, result, compositExclusion);
 		}
 	}
 	
 	Magic * feat() { return &magic; }
 	
-	HGECanJott()
-	: magic(imp_cast<RealSelf *>(this))
-	, publisher(0)
+	HGECanJott(Publisher * p = 0)
+	: Parent()
+	, magic(imp_cast<RealSelf *>(this))
+	, publisher(p)
+	{}
+	
+	template <typename Delegate>
+	HGECanJott(Publisher * p = 0, Delegate * delegate = 0)
+	: Parent(delegate)
+	, magic(imp_cast<RealSelf *>(this))
+	, publisher(p)
 	{}
 	
 private:
@@ -77,19 +87,12 @@ private:
 	
 public:
 	
-	typedef HGEWorker Publisher;
-	
 	/**
 	 send json to a worker
 	 */
 	virtual bool jott(JSONValue& json, bool purify = 0) {
 		return this->publisher->produceJSON(json, purify);
 	}
-	
-	HGECanJott(Publisher * p)
-	: magic(imp_cast<RealSelf *>(this))
-	, publisher(p)
-	{}
 	
 private:
 	

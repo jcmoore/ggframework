@@ -57,7 +57,7 @@ public:
 		}
 	};
 	
-	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result, HGECantImp * compositExclusion) {
 		if (HGE_LIKEA( hybridge::HGECanTask ) == interface) {
 			if (result) {
 				*result = imp_cast<hybridge::HGECanTask<>::Magic *>(this->feat());
@@ -69,14 +69,22 @@ public:
 			}
 			return !0;
 		} else {
-			return this->RealParent::canYou(interface, result);
+			return this->RealParent::canYou(interface, result, compositExclusion);
 		}
 	}
 	
 	Magic * feat() { return &magic; }
 	
 	HGECanTask()
-	: magic(imp_cast<RealSelf *>(this))
+	: Parent()
+	, magic(imp_cast<RealSelf *>(this))
+	, jotter(0)
+	{}
+	
+	template <typename Delegate>
+	HGECanTask(Delegate * delegate = 0)
+	: Parent(delegate)
+	, magic(imp_cast<RealSelf *>(this))
 	, jotter(0)
 	{}
 	
@@ -89,12 +97,39 @@ public:
 	typedef HGECanJott<>::Magic Jotter;
 	typedef HGECanIdentify<>::Magic Identifier;
 	
-	virtual bool task(JSONValue& json, bool purify = 0) {
-		return this->jotter->jott(json, purify);
+	bool draft(JSONValue& json) {
+		if (!json.IsObject()) {
+			HGEAssertC(0, "tasker can only task JSON objects but was given JSON type: %i", json.GetType());
+			return 0;
+		}
+		
+		json.AddMember(HGE_KEYTEXT_BOTTOM_LEVEL_DOMAIN_NAME, this->identifier->getDomainName());
+		json.AddMember(HGE_KEYTEXT_PORT_NUMBER, this->identifier->getPortNumber());
+		return this->jotter->jott(json, 0);
 	}
 	
+	virtual bool task(JSONValue& json, bool purify = 0) {
+		if (purify) {
+			JSONValue dupe;
+			JSONDoc doc;
+			doc.Reproduce(json, dupe);
+			return this->draft(dupe);
+		} else {
+			return this->draft(json);
+		}
+	}
+
 	HGECanTask(Jotter * j, Identifier * i)
-	: magic(imp_cast<RealSelf *>(this))
+	: Parent()
+	, magic(imp_cast<RealSelf *>(this))
+	, jotter(j)
+	, identifier(i)
+	{}
+	
+	template <typename Delegate>
+	HGECanTask(Jotter * j, Identifier * i, Delegate * delegate = 0)
+	: Parent(delegate)
+	, magic(imp_cast<RealSelf *>(this))
 	, jotter(j)
 	, identifier(i)
 	{}

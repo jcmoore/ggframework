@@ -50,27 +50,24 @@ bool HGEWorker::produceJSON(JSONValue& json, bool purify) {
 	return 0;
 }
 
+void HGEWorker::inscribeJSON(JSONValue& result, JSONValue& json) {
+	if (this->getSuperior()) {
+		result.SetObject();
+		result.AddMember(this->alias.c_str(), json);
+	} else {
+		result = json;
+	}
+}
+
 void HGEWorker::markJSON(JSONValue& result, JSONValue& json, bool purify) {
 	
 	if (purify) {
 		JSONValue dupe;
 		JSONDoc doc;
 		doc.Reproduce(json, dupe);
-		// TODO: fix code duplications
-		if (this->getSuperior()) {
-			result.SetObject();
-			result.AddMember(this->alias.c_str(), dupe);
-		} else {
-			result = dupe;
-		}
+		this->inscribeJSON(result, dupe);
 	} else {
-		// TODO: fix code duplications
-		if (this->getSuperior()) {
-			result.SetObject();
-			result.AddMember(this->alias.c_str(), json);
-		} else {
-			result = json;
-		}
+		this->inscribeJSON(result, json);
 	}
 }
 

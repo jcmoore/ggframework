@@ -1,16 +1,22 @@
 //
-//  HGECCField.cpp
+//  HGECCZone.cpp
 //  hybridge
 //
 //  Created by The Narrator on 10/28/12.
 //
 //
 
-#include "graphics/HGECCField.h"
+#include "graphics/HGECCZone.h"
 
 //#include "service/HGERouter.h"
 
 USING_NS_CC;
+
+#define NATIVE_ONLY				0
+
+#define HGE_KEYTEXT_TASK_ZONE_INPUT			"input"
+
+
 
 NS_HGE_BEGIN
 
@@ -41,6 +47,12 @@ public:
 	}
 	
 	typedef CCPrimitive<timeSD_hge> PrimitiveTime;
+	
+	void passInput(JSONValue& json, bool purify) {
+#if !NATIVE_ONLY
+		this->jotter->jott(json, purify);
+#endif
+	}
 	
     virtual void ccTouchesBegan(CCSet * touches, CCEvent * event) {
 		
@@ -83,11 +95,11 @@ public:
 		}
 		
 		JSONValue message(vapidjson::kObjectType);
-		message.AddMember("event", "input");
-		message.AddMember("data", list);
+		message.AddMember(HGE_KEYTEXT_TASK, HGE_KEYTEXT_TASK_ZONE_INPUT);
+		message.AddMember(HGE_KEYTEXT_ARGS, list);
 		message.AddMember("meta", 1 * count);
 		
-		this->jotter->jott(message, 0);
+		this->passInput(message, 0);
 	}
 	
     virtual void ccTouchesMoved(CCSet * touches, CCEvent * event) {
@@ -117,7 +129,7 @@ public:
 			
 			JSONValue value(vapidjson::kObjectType);
 			
-			value.AddMember("f", 1);
+			value.AddMember("f", 0);
 			value.AddMember("n", touch->getID());
 			value.AddMember("t", currentTime);
 			value.AddMember("x", (int)(locationNow.x));
@@ -126,17 +138,23 @@ public:
 			value.AddMember("xx", (int)(locationNow.x - locationThen.x));
 			value.AddMember("yy", (int)(locationNow.y - locationThen.y));
 			
+#if NATIVE_ONLY
+			CCPoint locationMy = this->getPosition();
+			this->setPosition(locationMy.x + (locationNow.x - locationThen.x),
+							  locationMy.y + (locationNow.y - locationThen.y));
+#endif
+			
 			list.PushBack(value);
 			
 			count++;
 		}
 		
 		JSONValue message(vapidjson::kObjectType);
-		message.AddMember("event", "input");
-		message.AddMember("data", list);
+		message.AddMember(HGE_KEYTEXT_TASK, HGE_KEYTEXT_TASK_ZONE_INPUT);
+		message.AddMember(HGE_KEYTEXT_ARGS, list);
 		message.AddMember("meta", 0 * count);
 		
-		this->jotter->jott(message, 0);
+		this->passInput(message, 0);
 	}
 	
     virtual void ccTouchesEnded(CCSet * touches, CCEvent * event) {
@@ -166,7 +184,7 @@ public:
 			
 			JSONValue value(vapidjson::kObjectType);
 			
-			value.AddMember("f", 1);
+			value.AddMember("f", -1);
 			value.AddMember("n", touch->getID());
 			value.AddMember("t", currentTime);
 			value.AddMember("x", (int)(locationNow.x));
@@ -181,11 +199,11 @@ public:
 		}
 		
 		JSONValue message(vapidjson::kObjectType);
-		message.AddMember("event", "input");
-		message.AddMember("data", list);
+		message.AddMember(HGE_KEYTEXT_TASK, HGE_KEYTEXT_TASK_ZONE_INPUT);
+		message.AddMember(HGE_KEYTEXT_ARGS, list);
 		message.AddMember("meta", -1 * count);
 		
-		this->jotter->jott(message, 0);
+		this->passInput(message, 0);
 	}
 	
     virtual void ccTouchesCancelled(CCSet * touches, CCEvent * event) {
@@ -215,7 +233,7 @@ public:
 			
 			JSONValue value(vapidjson::kObjectType);
 			
-			value.AddMember("f", 1);
+			value.AddMember("f", vapidjson::kNullType);
 			value.AddMember("n", touch->getID());
 			value.AddMember("t", currentTime);
 			value.AddMember("x", (int)(locationNow.x));
@@ -230,11 +248,11 @@ public:
 		}
 		
 		JSONValue message(vapidjson::kObjectType);
-		message.AddMember("event", "input");
-		message.AddMember("data", list);
+		message.AddMember(HGE_KEYTEXT_TASK, HGE_KEYTEXT_TASK_ZONE_INPUT);
+		message.AddMember(HGE_KEYTEXT_ARGS, list);
 		message.AddMember("meta", -1 * count);
 		
-		this->jotter->jott(message, 0);
+		this->passInput(message, 0);
 	}
 	
 	timeSD_hge timeForTouch(int id, timeSD_hge fallback) {
@@ -270,7 +288,7 @@ public:
 	CCDictionary inputTimes;
 };
 
-bool HGECCField::destroyJSON(JSONValue& json, bool firstResponder)
+bool HGECCZone::destroyJSON(JSONValue& json, bool firstResponder)
 {
 	bool didDestroy = 0;
 	
@@ -283,7 +301,7 @@ bool HGECCField::destroyJSON(JSONValue& json, bool firstResponder)
 	return HGECCNexus::createJSON(json, firstResponder) || didDestroy;
 }
 
-bool HGECCField::createJSON(JSONValue& json, bool firstResponder)
+bool HGECCZone::createJSON(JSONValue& json, bool firstResponder)
 {
 	bool didCreate = 0;
 	
@@ -303,7 +321,7 @@ bool HGECCField::createJSON(JSONValue& json, bool firstResponder)
 	return HGECCNexus::createJSON(json, firstResponder) || didCreate;
 }
 
-bool HGECCField::enactJSON(JSONValue& task, JSONValue& json, bool firstResponder)
+bool HGECCZone::enactJSON(JSONValue& task, JSONValue& json, bool firstResponder)
 {
 	bool didEnact = 0;
 	

@@ -29,10 +29,11 @@ NS_HGE_BEGIN
 /**
  base class of all uniquely identifiable instance-based sub-services that can turn JSON into actions
  */
+
 class HGEEntity : public
 HGECanChip < HGEEntity, 
 HGECanImp < HGEEntity,
-void > > {
+HGEEntity > > {
 	
 public:
 	

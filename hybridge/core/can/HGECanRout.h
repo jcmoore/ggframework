@@ -81,14 +81,14 @@ public:
 		}
 	};
 	
-	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result, HGECantImp * compositExclusion) {
 		if (HGE_LIKEA( hybridge::HGECanRout ) == interface) {
 			if (result) {
 				*result = static_cast<hybridge::HGECanRout<>::Magic *>(this->feat());
 			}
 			return !0;
 		} else {
-			return this->RealParent::canYou(interface, result);
+			return this->RealParent::canYou(interface, result, compositExclusion);
 		}
 	}
 	
@@ -110,7 +110,14 @@ public:
 	Magic * feat() { return &magic; }
 	
 	HGECanRout()
-	: magic(imp_cast<RealSelf *>(this))
+	: Parent()
+	, magic(imp_cast<RealSelf *>(this))
+	{}
+	
+	template <typename Delegate>
+	HGECanRout(Delegate * delegate = 0)
+	: Parent(delegate)
+	, magic(imp_cast<RealSelf *>(this))
 	{}
 	
 private:

@@ -28,25 +28,43 @@ protected:
 	typedef
 	HGECanJott <
 	HGECanImp < 
-	HGEEntity > >
+	MagicImp::MagicDerived > >
 	Jotter;
 	Jotter jotter;
 	
 	typedef
 	HGECanIdentify <
 	HGECanImp <
-	HGEEntity > >
+	MagicImp::MagicDerived > >
 	Identity;
 	Identity identity;
 	
 	typedef 
 	HGECanTask <
 	HGECanImp <
-	HGEEntity > >
+	MagicImp::MagicDerived > >
 	Tasker;
 	Tasker tasker;
 	
 public:
+	
+	/**
+	 composite imps should impliment this
+	 */
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result, HGECantImp * compositExclusion) {
+		if ((HGECantImp *)(&this->jotter) != compositExclusion &&
+			this->jotter.canYou(interface, result, this)) {
+			return !0;
+		} else if ((HGECantImp *)(&this->identity) != compositExclusion &&
+				   this->identity.canYou(interface, result, this)){
+			return !0;
+		} else if ((HGECantImp *)(&this->tasker) != compositExclusion &&
+				   this->tasker.canYou(interface, result, this)){
+			return !0;
+		} else {
+			return MagicParent::canYou(interface, result, compositExclusion);
+		}
+	}
 	
 protected:
 	
@@ -67,12 +85,15 @@ public:
 	HGECCFabric(HGEBottomLevelDomainName bldn,
 				HGEPortNumber port,
 				Jotter::Publisher * p)
-	: jotter(p)
-	, identity(bldn, port)
-	, tasker(this->jotter.feat(), this->identity.feat())
+	: jotter(p, this)
+	, identity(bldn, port, this)
+	, tasker(this->jotter.feat(), this->identity.feat(), this)
 	{
 		this->cc.texture = 0;
 		this->cccahced = 0;
+		HGECanImp<>::Magic<> * result = 0;
+		this->jotter.feat()->canDo(HGE_LIKEA(HGECanIdentify), &result);
+		HGEAssertC(result == this->identity.feat(), "are we there yet?");
 	};
 	
 	/**

@@ -47,21 +47,30 @@ public:
 		Magic(RealSelf * d) : Trick(d) {}
 	};
 	
-	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result, HGECantImp * compositExclusion) {
 		if (HGE_LIKEA( hybridge::HGECanCircuit ) == interface) {
 			if (result) {
 				*result = static_cast<hybridge::HGECanCircuit<>::Magic *>(this->feat());
 			}
 			return !0;
 		} else {
-			return this->RealParent::canYou(interface, result);
+			return this->RealParent::canYou(interface, result, compositExclusion);
 		}
 	}
 	
 	Magic * feat() { return &magic; }
 	
 	HGECanCircuit()
-	: magic(static_cast<RealSelf *>(this))
+	: Parent()
+	, magic(static_cast<RealSelf *>(this))
+	, favorite(this)
+	, popularity(0)
+	{}
+	
+	template <typename Delegate>
+	HGECanCircuit(Delegate * delegate = 0)
+	: Parent(delegate)
+	, magic(static_cast<RealSelf *>(this))
 	, favorite(this)
 	, popularity(0)
 	{}
@@ -197,7 +206,7 @@ protected:
 			return 0;
 		}
 		
-		MagicCircuit * authority = hint;
+		MagicCircuit * authority = static_cast<MagicCircuit *>(hint);
 		LoopCheckCount count = 0;
 		
 		while (authority) {

@@ -72,6 +72,11 @@ private:
 	
 	HGESuperior * superior;
 	
+	/**
+	 helper function used by markJSON
+	 */
+	void inscribeJSON(JSONValue& result, JSONValue& json);
+	
 public:
 	
 	/**

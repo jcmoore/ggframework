@@ -14,8 +14,9 @@
 
 NS_HGE_BEGIN
 
-HGEGate::HGEGate(const char * a)
+HGEGate::HGEGate(const char * a, bool doubleBuffered)
 : HGEWorker(a)
+, isDoubleBuffered(doubleBuffered)
 , mainQueue(new JSONValue())
 , offQueue(new JSONValue())
 {
@@ -45,6 +46,10 @@ bool HGEGate::digestJSON(JSONValue& json) {
 	this->markJSON(brief, json, 0);
 	
 	this->produceJSON(brief);
+	
+	if (!this->isDoubleBuffered) {
+		return !0;
+	}
 	
 	if (!this->offQueue->Empty()) {
 		//HGEAssertC(0, "unexpected (but note catastrophic[?]) gate flush request when off queue is not empty (investigate why)");
@@ -114,8 +119,13 @@ bool HGEGate::openJSON(JSONValue& result) {
 	
 	{
 		HGEMutex::Lock lock(this->mutex);
-		result = *this->offQueue;
-		this->offQueue->SetArray();
+		if (this->isDoubleBuffered) {
+			result = *this->offQueue;
+			this->offQueue->SetArray();
+		} else {
+			result = *this->mainQueue;
+			this->mainQueue->SetArray();
+		}
 	}
 	return !0;
 }

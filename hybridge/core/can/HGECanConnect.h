@@ -37,6 +37,8 @@ public:
 	typedef Parent RealParent;
 	typedef HGECanConnect RealSelf;
 	
+	typedef HGERouter::BottomLevelNameServerInterface NameServer;
+	
 private:
 	typedef HGECanImp<>::Magic< RealSelf, HGECanConnect<>::Magic > Trick;
 public:
@@ -45,21 +47,30 @@ public:
 		Magic(RealSelf * d) : Trick(d) {}
 	};
 	
-	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result) {
+	virtual bool canYou(like_hge interface, HGECanImp<>::Magic<> ** result, HGECantImp * compositExclusion) {
 		if (HGE_LIKEA( hybridge::HGECanConnect ) == interface) {
 			if (result) {
 				*result = static_cast<hybridge::HGECanConnect<>::Magic *>(this->feat());
 			}
 			return !0;
 		} else {
-			return this->RealParent::canYou(interface, result);
+			return this->RealParent::canYou(interface, result, compositExclusion);
 		}
 	}
 	
 	Magic * feat() { return &magic; }
 	
-	HGECanConnect()
-	: magic(static_cast<RealSelf *>(this)),  bdns(0)
+	HGECanConnect(NameServer * ns = 0)
+	: Parent()
+	, magic(static_cast<RealSelf *>(this))
+	, bdns(ns)
+	{}
+	
+	template <typename Delegate>
+	HGECanConnect(NameServer * ns = 0, Delegate * delegate = 0)
+	: Parent(delegate)
+	, magic(static_cast<RealSelf *>(this))
+	, bdns(ns)
 	{}
 	
 private:
@@ -68,17 +79,9 @@ private:
 	
 public:
 	
-	typedef HGERouter::BottomLevelNameServerInterface NameServer;
-	
 	virtual HGEHandler * whois(HGEBottomLevelDomainName bldn, HGEPortNumber port) {
 		return this->bdns->whois(bldn, port);
 	}
-	
-	
-	HGECanConnect(NameServer * ns)
-	: magic(static_cast<RealSelf *>(this))
-	, bdns(ns)
-	{}
 	
 protected:
 	
