@@ -27,7 +27,7 @@ bool HGECCPixie::destroyJSON(JSONValue& json, bool firstResponder)
 		firstResponder = 0;
 	}
 	
-	return HGECCNexus::createJSON(json, firstResponder) || didDestroy;
+	return HGECCNexus::destroyJSON(json, firstResponder) || didDestroy;
 }
 
 bool HGECCPixie::createJSON(JSONValue& json, bool firstResponder)
@@ -236,7 +236,7 @@ bool HGECCPixie::setFabric(JSONValue const& json, bool implicit)
 		return 0;
 	}
 	
-	HGEHandler * handler = this->online.whois(domain, port);
+	HGEHandler * handler = this->connector.whois(domain, port);
 	HGECCFabric * fabric = handler ? handler->canTo<HGECCFabric>() : 0;
 	if (!fabric) {
 		HGEAssertC(implicit, "fabric could not be resolved from %li/%li (domain/id)", domain, port);
@@ -261,11 +261,10 @@ bool HGECCPixie::setFabric(HGECCFabric * fabric)
 	
 	if (texture != previous) {
 		this->cc.sprite->setTexture(texture);
-		CCRect rect = this->cc.sprite->getTextureRect();
 		// WARNING: this condition may not be consistent with how HGECCFabric works
 		// (particularly if it creates an empty CCTexture2D object by default)
-		if (!previous &&
-			rect.equals(CCRectZero)) {
+		if (!previous) {
+			CCRect rect = this->cc.sprite->getTextureRect();
 			rect.size = texture->getContentSize();
 			this->cc.sprite->setTextureRect(rect);
 		}

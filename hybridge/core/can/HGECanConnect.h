@@ -31,7 +31,7 @@ template < typename Derived, typename Parent >
 class HGECanConnect : public Parent {
 public:
 	
-	typedef HGECanConnect MagicOnline;
+	typedef HGECanConnect MagicConnector;
 	typedef HGECanConnect MagicParent;
 	typedef Derived MagicDerived;
 	typedef Parent RealParent;

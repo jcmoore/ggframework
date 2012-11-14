@@ -43,7 +43,7 @@ protected:
 	}
 public:
 	
-	HGECCScape(Jotter::Publisher * p, Online::NameServer * ns)
+	HGECCScape(Jotter::Publisher * p, Connector::NameServer * ns)
 	: HGECCNexus(p, ns) {};
 	
 	/**

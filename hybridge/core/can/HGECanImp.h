@@ -61,7 +61,8 @@ public:
 	
 	template < typename Destination >
 	Destination * canTo() {
-		typedef typename HGECanImp<>::Magic< Destination > Messenger;
+		typedef typename Destination::MagicDerived Intermediary;
+		typedef typename HGECanImp<>::Magic< Intermediary > Messenger;
 		
 		Messenger courier;
 		
@@ -70,9 +71,9 @@ public:
 		while ((delegator = delegator->passTo(&courier))) {
 		}
 		
-		Destination * concrete = 0;
+		Intermediary * concrete = 0;
 		if (courier.sendTo(HGE_KINDOF(Destination), &concrete)) {
-			return concrete;
+			return static_cast<Destination *>(concrete);
 		}
 		return 0;
 	}

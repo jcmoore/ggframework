@@ -46,7 +46,7 @@ protected:
 	}
 public:
 	
-	HGECCPixie(Jotter::Publisher * p, Online::NameServer * ns)
+	HGECCPixie(Jotter::Publisher * p, Connector::NameServer * ns)
 	: HGECCNexus(p, ns)
 	, fabricRef() {};
 	

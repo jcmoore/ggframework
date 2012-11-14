@@ -46,7 +46,7 @@ protected:
 	}
 public:
 	
-	HGECCTroop(Jotter::Publisher * p, Online::NameServer * ns)
+	HGECCTroop(Jotter::Publisher * p, Connector::NameServer * ns)
 	: HGECCNexus(p, ns)
 	, fabricRef() {};
 	

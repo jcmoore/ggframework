@@ -96,7 +96,7 @@ bool HGECCNexus::addLeaf(JSONValue const& json, bool implicit)
 		return 0;
 	}
 	
-	HGEHandler * handler = this->online.whois(domain, port);
+	HGEHandler * handler = this->connector.whois(domain, port);
 	HGECCNexus * leaf = handler ? handler->canTo<HGECCNexus>() : 0;
 	
 	if (!leaf) {

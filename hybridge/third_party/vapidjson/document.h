@@ -787,12 +787,12 @@ private:
 	}
 	
 public:
-	void* operator new (size_t) {
-		return Mallocator().allocate();
-	}
-	void operator delete (void* storage) {
-		Mallocator().deallocate(storage);
-	}
+	//void* operator new (size_t) {
+	//	return Mallocator().allocate();
+	//}
+	//void operator delete (void* storage) {
+	//	Mallocator().deallocate(storage);
+	//}
 };
 #pragma pack (pop)
 

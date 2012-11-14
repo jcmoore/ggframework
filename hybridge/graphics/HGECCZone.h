@@ -80,7 +80,7 @@ public:
 	HGECCZone(HGEBottomLevelDomainName bldn,
 			   HGEPortNumber port,
 			   Jotter::Publisher * p,
-			   Online::NameServer * ns)
+			   Connector::NameServer * ns)
 	: HGECCNexus(p, ns)
 	, identity(bldn, port, this)
 	, tasker(this->jotter.feat(), this->identity.feat(), this)

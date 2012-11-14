@@ -31,8 +31,8 @@ protected:
 	HGECanConnect <
 	HGECanImp <
 	MagicImp::MagicDerived > >
-	Online;
-	Online online;
+	Connector;
+	Connector connector;
 	
 	typedef
 	HGECanJott <
@@ -50,8 +50,8 @@ public:
 		if ((HGECantImp *)(&this->jotter) != compositExclusion &&
 			this->jotter.canYou(interface, result, this)) {
 			return !0;
-		} else if ((HGECantImp *)(&this->online) != compositExclusion &&
-				   this->online.canYou(interface, result, this)){
+		} else if ((HGECantImp *)(&this->connector) != compositExclusion &&
+				   this->connector.canYou(interface, result, this)){
 			return !0;
 		} else {
 			return MagicParent::canYou(interface, result, compositExclusion);
@@ -74,8 +74,8 @@ protected:
 	
 public:
 	
-	HGECCNexus(Jotter::Publisher * p, Online::NameServer * ns)
-	: online(ns, this)
+	HGECCNexus(Jotter::Publisher * p, Connector::NameServer * ns)
+	: connector(ns, this)
 	, jotter(p, this)
 	//: HGEEntity()
 	{

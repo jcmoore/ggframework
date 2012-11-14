@@ -9,6 +9,8 @@
 #ifndef __HGECCFABRIC_H__
 #define __HGECCFABRIC_H__
 
+#include "core/HGEEntity.h"
+
 #include "core/can/HGECanRout.h"
 #include "core/can/HGECanJott.h"
 #include "core/can/HGECanIdentify.h"
@@ -91,9 +93,6 @@ public:
 	{
 		this->cc.texture = 0;
 		this->cccahced = 0;
-		HGECanImp<>::Magic<> * result = 0;
-		this->jotter.feat()->canDo(HGE_LIKEA(HGECanIdentify), &result);
-		HGEAssertC(result == this->identity.feat(), "are we there yet?");
 	};
 	
 	/**
@@ -118,11 +117,12 @@ public:
 	
 	virtual bool cleanup(bool firstResponder);
 	
-	cocos2d::CCTexture2D * getTexture() { return this->cc.texture; }
+	virtual cocos2d::CCTexture2D * getTexture() { return this->cc.texture; }
 	
 protected:
 	union cctype {
 		cocos2d::CCTexture2D * texture;
+		cocos2d::CCRenderTexture * renderTexture;
 	};
 	
 	cctype cc;

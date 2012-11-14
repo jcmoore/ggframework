@@ -70,7 +70,7 @@ public:
 	/**
 	 true if the reference contains no object
 	 */
-	bool unset () { return this->handle.unset() == 0; }
+	bool unset () { return this->handle.unset(); }
 	/**
 	 true if the reference's version does not match the contained object's version
 	 */
@@ -145,7 +145,7 @@ public:
 	/**
 	 true if the reference contains no object
 	 */
-	bool unset () { return this->handle.unset() == 0; }
+	bool unset () { return this->handle.unset(); }
 	/**
 	 true if the reference's version does not match the contained object's version
 	 */

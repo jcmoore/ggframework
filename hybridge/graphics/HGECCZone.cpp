@@ -298,7 +298,7 @@ bool HGECCZone::destroyJSON(JSONValue& json, bool firstResponder)
 		firstResponder = 0;
 	}
 	
-	return HGECCNexus::createJSON(json, firstResponder) || didDestroy;
+	return HGECCNexus::destroyJSON(json, firstResponder) || didDestroy;
 }
 
 bool HGECCZone::createJSON(JSONValue& json, bool firstResponder)

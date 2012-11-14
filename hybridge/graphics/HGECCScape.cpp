@@ -24,7 +24,7 @@ bool HGECCScape::destroyJSON(JSONValue& json, bool firstResponder)
 		firstResponder = 0;
 	}
 	
-	return HGECCNexus::createJSON(json, firstResponder) || diDestroy;
+	return HGECCNexus::destroyJSON(json, firstResponder) || diDestroy;
 }
 
 bool HGECCScape::createJSON(JSONValue& json, bool firstResponder)
