@@ -24,6 +24,7 @@
 #define HGE_KEYTEXT_SERVICE_ASSEMBLER			"&"
 #define HGE_KEYTEXT_SERVICE_GATE				"#"
 #define HGE_KEYTEXT_SERVICE_LOGGER				"<<"
+#define HGE_KEYTEXT_SERVICE_DISH				">>"
 #define HGE_KEYTEXT_SERVICE_ROUTER				"@"
 
 #endif

@@ -126,6 +126,7 @@ protected:
 		cocos2d::CCLayer * layer;
 		cocos2d::CCScene * scene;
 		cocos2d::CCSpriteBatchNode * batch;
+		cocos2d::CCNode * custom;
 	};
 	cctype cc;
 	depth_nexus ccelevation;

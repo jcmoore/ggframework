@@ -19,7 +19,14 @@ bool HGECCScape::destroyJSON(JSONValue& json, bool firstResponder)
 	bool diDestroy = 0;
 	
 	if (firstResponder) {
-		HGEDeleteNull(this->cc.scene);
+		if (this->cc.scene) {
+			if (this->cc.scene->isRunning()) {
+				CCDirector::sharedDirector()->popScene();
+			}
+			this->cc.scene->removeFromParentAndCleanup(!0);
+			this->cc.scene->release();
+			this->cc.scene = 0;
+		}
 		diDestroy = !0;
 		firstResponder = 0;
 	}

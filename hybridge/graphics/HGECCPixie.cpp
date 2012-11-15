@@ -22,7 +22,11 @@ bool HGECCPixie::destroyJSON(JSONValue& json, bool firstResponder)
 	bool didDestroy = 0;
 	
 	if (firstResponder) {
-		HGEDeleteNull(this->cc.sprite);
+		if (this->cc.sprite) {
+			this->cc.sprite->removeFromParentAndCleanup(!0);
+			this->cc.sprite->release();
+			this->cc.sprite = 0;
+		}
 		didDestroy = !0;
 		firstResponder = 0;
 	}

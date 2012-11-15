@@ -22,7 +22,11 @@ bool HGECCTroop::destroyJSON(JSONValue& json, bool firstResponder)
 	bool didDestroy = 0;
 	
 	if (firstResponder) {
-		HGEDeleteNull(this->cc.batch);
+		if (this->cc.batch) {
+			this->cc.batch->removeFromParentAndCleanup(!0);
+			this->cc.batch->release();
+			this->cc.batch = 0;
+		}
 		didDestroy = !0;
 		firstResponder = 0;
 	}

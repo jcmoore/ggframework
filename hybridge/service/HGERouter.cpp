@@ -79,7 +79,6 @@ bool HGERouter::digestJSON(JSONValue& json) {
 		if (taskString &&
 			taskString[0] == '~') {
 			bool result = handler->destroyJSON(json, !0);
-			HGEDeleteNull(handler);
 			safeListing->erase(iter);
 			return result;
 		} else {

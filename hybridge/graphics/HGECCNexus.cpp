@@ -19,7 +19,11 @@ bool HGECCNexus::destroyJSON(JSONValue& json, bool firstResponder)
 	bool didDestroy = 0;
 	
 	if (firstResponder) {
-		HGEDeleteNull(this->cc.node);
+		if (this->cc.node) {
+			this->cc.node->removeFromParentAndCleanup(!0);
+			this->cc.node->release();
+			this->cc.node = 0;
+		}
 		didDestroy = !0;
 		firstResponder = 0;
 	}

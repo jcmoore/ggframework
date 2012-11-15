@@ -39,9 +39,9 @@ private:
     Simple value;
 };
 
-class FieldInputLayer : public CCLayer {
+class CCFieldInputLayer : public CCLayer {
 public:
-	FieldInputLayer(HGECanJott<>::Magic * j)
+	CCFieldInputLayer(HGECanJott<>::Magic * j)
 	: CCLayer()
 	, jotter(j) {
 	}
@@ -293,7 +293,11 @@ bool HGECCZone::destroyJSON(JSONValue& json, bool firstResponder)
 	bool didDestroy = 0;
 	
 	if (firstResponder) {
-		HGEDeleteNull(this->cc.layer);
+		if (this->cc.layer) {
+			this->cc.layer->removeFromParentAndCleanup(!0);
+			this->cc.layer->release();
+			this->cc.layer = 0;
+		}
 		didDestroy = !0;
 		firstResponder = 0;
 	}
@@ -308,7 +312,7 @@ bool HGECCZone::createJSON(JSONValue& json, bool firstResponder)
 	if (json.IsObject()) {
 		if (firstResponder) {
 			HGEAssertC(!this->cc.layer, "leaking");
-			this->cc.layer = new FieldInputLayer(this->tasker.feat());
+			this->cc.layer = new CCFieldInputLayer(this->tasker.feat());
 			this->cc.layer->init();
 			this->cc.layer->setTouchEnabled(!0);
 			didCreate = !0;
