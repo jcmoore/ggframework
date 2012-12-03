@@ -25,6 +25,8 @@ HGECanRout < HGECCFabric,
 HGECanImp < HGECCFabric,
 HGEEntity > > {
 	
+	typedef MagicParent Parent;
+	
 protected:
 	
 	typedef
@@ -64,7 +66,7 @@ public:
 				   this->tasker.canYou(interface, result, this)){
 			return !0;
 		} else {
-			return MagicParent::canYou(interface, result, compositExclusion);
+			return this->Parent::canYou(interface, result, compositExclusion);
 		}
 	}
 	
@@ -72,7 +74,7 @@ protected:
 	
 	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		if (kind_hge(condition) == HGE_KINDOF( HGECCFabric ) ||
-			HGEEntity::beKind(condition, result)) {
+			this->Parent::beKind(condition, result)) {
 			if (result) {
 				*result = this;
 			}

@@ -31,6 +31,8 @@ HGECanCircuit < HGEWorker,
 HGECanImp < HGEWorker,
 HGEEntity > > {
 	
+	typedef MagicParent Parent;
+	
 public:
 	
 public:

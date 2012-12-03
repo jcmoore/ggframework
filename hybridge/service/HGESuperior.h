@@ -14,6 +14,7 @@
 #include "service/HGEWorker.h"
 
 #include <map>
+#include <list>
 
 NS_HGE_BEGIN
 
@@ -23,11 +24,13 @@ NS_HGE_BEGIN
 class HGESuperior : public HGEWorker {
 	
 	typedef std::map<const char *, HGEWorker *, cmpstr> Team;
+	typedef std::list< HGEWorker * > Rank;
 	
+	typedef Rank::const_iterator RankIterator;
+
 public:
 	
-	typedef Team::const_iterator TeamIterator;
-	
+	typedef Team::const_iterator TeamIterator;	
 	HGESuperior(const char * a);
 	virtual ~HGESuperior();
 	
@@ -98,6 +101,7 @@ protected:
 	
 	HGEWorker * assistant;
 	Team hires;
+	Rank seniority;
 };
 
 NS_HGE_END

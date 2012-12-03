@@ -61,7 +61,9 @@ bool HGECCNexus::enactJSON(JSONValue& task, JSONValue& json, bool firstResponder
 	if (task.IsString()) {
 		const char * taskStr = task.GetString();
 		
-		if (strcmp(taskStr, "addLeaf") == 0) {
+		if (strcmp(taskStr, "removeLeaf") == 0) {
+			didEnact = this->removeLeaf(json);
+		} else if (strcmp(taskStr, "addLeaf") == 0) {
 			didEnact = this->addLeaf(json);
 		} else if (strcmp(taskStr, "setRoot") == 0) {
 			didEnact = this->setRoot(json);
@@ -80,6 +82,44 @@ bool HGECCNexus::enactJSON(JSONValue& task, JSONValue& json, bool firstResponder
 }
 
 
+
+bool HGECCNexus::removeLeaf(JSONValue const& json, bool implicit) {
+	JSONValue const * pointer = 0;
+	
+	pointer = &json["leafDn"];
+	HGEBottomLevelDomainName domain = pointer->IsString() ? pointer->GetString() : 0;
+	
+	pointer = &json["leafId"];
+	if (!pointer->IsNumber()) {
+		HGEAssertC(implicit, "no numeric leafId");
+		return 0;
+	}
+	
+	HGEPortNumber port = pointer->GetUint64();
+	if (!port) {
+		HGEAssertC(implicit, "leafId was zero...");
+		return 0;
+	}
+	
+	HGEHandler * handler = this->connector.whois(domain, port);
+	HGECCNexus * leaf = handler ? handler->canTo<HGECCNexus>() : 0;
+	
+	if (!leaf) {
+		HGEAssertC(implicit, "leaf could not be resolved from %li/%li (domain/port)", domain, port);
+		return 0;
+		
+	}
+	
+	pointer = &json["tidy"];
+	bool tidy = pointer->IsBool() ? pointer->GetBool() : 0;
+	
+	return this->removeLeaf(leaf, tidy);
+}
+
+bool HGECCNexus::removeLeaf(HGECCNexus * leaf, bool tidy) {
+	this->cc.node->removeChild(leaf->cc.node, tidy );
+	return !0;
+}
 
 bool HGECCNexus::addLeaf(JSONValue const& json, bool implicit)
 {

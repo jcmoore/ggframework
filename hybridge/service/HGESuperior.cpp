@@ -67,11 +67,31 @@ bool HGESuperior::produceJSON(JSONValue& json, bool purify) {
 }
 
 bool HGESuperior::reportJSON(JSONValue& result) {
-	if (!this->assistant) {
-		return this->briefJSON(result);
+	
+	result.SetArray();
+	
+	for (Rank::iterator jter = this->seniority.begin(); jter != this->seniority.end(); jter++) {
+		HGEWorker * worker = (*jter);
+		bool willReport = !0;
+		do {
+			JSONValue json(vapidjson::kUndefinedType);
+			willReport = worker->reportJSON(json); // this is ugly...
+			if (json.IsUndefined()) {
+				continue;
+			}
+			JSONValue brief;
+			this->markJSON(brief, json, 0);
+			result.PushBack(brief);
+		} while (willReport);
 	}
 	
-	return this->assistant->reportJSON(result);
+	return !0;
+	
+	//if (!this->assistant) {
+	//	return this->briefJSON(result);
+	//}
+	//
+	//return this->assistant->reportJSON(result);
 }
 
 
@@ -103,6 +123,7 @@ bool HGESuperior::gainWorker(HGEWorker * worker) {
 	
 	teamMember = worker;
 	worker->setSuperior(this);
+	this->seniority.push_back(worker);
 	
 	return !0;
 }
@@ -122,7 +143,9 @@ HGEWorker * HGESuperior::lossWorker(Team::iterator iter) {
 	
 	HGEWorker * worker = iter->second;
 	this->hires.erase(iter);
+	this->seniority.remove(iter->second);
 	HGESuperior * boss = worker->getSuperior();
+	
 	
 	if (boss != this) {
 		HGEAssertC(boss->getHire(iter->first), "worker may be unemployed (but thinks its boss is %s)", boss->getAlias().c_str());

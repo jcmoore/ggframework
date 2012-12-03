@@ -190,6 +190,21 @@ bool HGECCPrintedFabric::start(bool clearColor, float r, float g, float b, float
 	}
 	
 	return !0;
+	
+	unsigned int size = 1;//6;
+	unsigned int width = this->getWidth();
+	unsigned int height = this->getWidth();
+	ccPointSize(size);
+	ccDrawColor4F(1, 1, 1, 1);
+	
+	ccGLBlendFunc( GL_ONE, GL_ZERO );
+	
+	ccDrawPoint(CCPoint((1 + size / 2), (1 + size / 2)));
+	ccDrawPoint(CCPoint(width - (1 + size / 2), (1 + size / 2)));
+	ccDrawPoint(CCPoint((1 + size / 2), height - (1 + size / 2)));
+	ccDrawPoint(CCPoint(width - (1 + size / 2), height - (1 + size / 2)));
+	
+	return !0;
 }
 
 bool HGECCPrintedFabric::finish(JSONValue const& json, bool implicit) {

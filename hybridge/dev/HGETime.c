@@ -18,7 +18,7 @@ timeSD_hge HGE_TIME_SD(void)
 	
 	gettimeofday(&instance, 0);
 	
-	return ((timeSD_hge)instance.tv_usec) * (0.000001);
+	return instance.tv_sec + ((timeSD_hge)instance.tv_usec) * (0.000001);
 }
 
 timeMSI_hge HGE_TIME_MSL(void)
@@ -27,5 +27,5 @@ timeMSI_hge HGE_TIME_MSL(void)
 	
 	gettimeofday(&instance, 0);
 	
-	return instance.tv_usec / 1000;
+	return 1000 * instance.tv_sec + instance.tv_usec / 1000;
 }

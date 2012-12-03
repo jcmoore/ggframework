@@ -25,6 +25,8 @@ HGECanRout < HGECCNexus,
 HGECanImp < HGECCNexus,
 HGEEntity > > {
 	
+	typedef MagicParent Parent;
+	
 protected:
 	
 	typedef
@@ -54,7 +56,7 @@ public:
 				   this->connector.canYou(interface, result, this)){
 			return !0;
 		} else {
-			return MagicParent::canYou(interface, result, compositExclusion);
+			return this->Parent::canYou(interface, result, compositExclusion);
 		}
 	}
 	
@@ -62,7 +64,7 @@ protected:
 	
 	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		if (kind_hge(condition) == HGE_KINDOF( HGECCNexus ) ||
-			HGEEntity::beKind(condition, result)) {
+			this->Parent::beKind(condition, result)) {
 			if (result) {
 				*result = this;
 			}
@@ -99,6 +101,9 @@ public:
 	virtual bool enactJSON(JSONValue& task, JSONValue& json, bool firstResponder);
 	
 	
+	
+	virtual bool removeLeaf(JSONValue const& json, bool implicit = 0);
+	virtual bool removeLeaf(HGECCNexus * leaf, bool tidy);
 	
 	virtual bool addLeaf(JSONValue const& json, bool implicit = 0);
 	virtual bool addLeaf(HGECCNexus * leaf, depth_nexus ele, key_nexus code);

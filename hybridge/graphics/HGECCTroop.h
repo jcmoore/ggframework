@@ -16,7 +16,10 @@ NS_HGE_BEGIN
 
 class HGECCFabric;
 
-class HGECCTroop : public HGECCNexus {
+class HGECCTroop : public
+HGECCNexus {
+	
+	typedef HGECCNexus Parent;
 	
 public:
 	
@@ -27,7 +30,7 @@ public:
 			}
 			return !0;
 		} else {
-			return this->HGECCNexus::areYou(concrete, result);
+			return this->Parent::areYou(concrete, result);
 		}
 	}
 	
@@ -35,7 +38,7 @@ protected:
 	
 	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		if (kind_hge(condition) == HGE_KINDOF( HGECCTroop ) ||
-			HGECCNexus::beKind(condition, result)) {
+			this->Parent::beKind(condition, result)) {
 			if (result) {
 				*result = this;
 			}

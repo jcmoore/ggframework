@@ -18,6 +18,8 @@ NS_HGE_BEGIN
 class HGECCZone : public
 HGECCNexus {
 	
+	typedef HGECCNexus Parent;
+	
 protected:
 	
 	typedef
@@ -47,7 +49,7 @@ public:
 				   this->identity.canYou(interface, result, this)){
 			return !0;
 		} else {
-			return MagicParent::canYou(interface, result, compositExclusion);
+			return this->Parent::canYou(interface, result, compositExclusion);
 		}
 	}
 	
@@ -58,7 +60,7 @@ public:
 			}
 			return !0;
 		} else {
-			return this->HGECCNexus::areYou(concrete, result);
+			return this->Parent::areYou(concrete, result);
 		}
 	}
 	
@@ -66,7 +68,7 @@ protected:
 	
 	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		if (kind_hge(condition) == HGE_KINDOF( HGECCZone ) ||
-			HGECCNexus::beKind(condition, result)) {
+			this->Parent::beKind(condition, result)) {
 			if (result) {
 				*result = this;
 			}

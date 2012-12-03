@@ -48,6 +48,8 @@ private:
 	
 	JSONValue * mainQueue;
 	JSONValue * offQueue;
+	JSONValue reporter;
+	JSONValueIter rter;
 	
 	HGEMutex mutex;
 	

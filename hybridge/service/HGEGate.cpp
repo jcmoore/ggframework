@@ -12,6 +12,10 @@
 
 
 
+#define NOTIFY_FLUSH		0
+
+
+
 NS_HGE_BEGIN
 
 HGEGate::HGEGate(const char * a, bool doubleBuffered)
@@ -19,6 +23,8 @@ HGEGate::HGEGate(const char * a, bool doubleBuffered)
 , isDoubleBuffered(doubleBuffered)
 , mainQueue(new JSONValue())
 , offQueue(new JSONValue())
+, reporter(vapidjson::kUndefinedType)
+, rter(0)
 {
 	{
 		HGEMutex::Lock lock(this->mutex);
@@ -42,10 +48,12 @@ bool HGEGate::digestJSON(JSONValue& json) {
 	
 	JSONValue brief;
 	
+#if NOTIFY_FLUSH
 	// WARNING: json is about to be sullied!
 	this->markJSON(brief, json, 0);
 	
 	this->produceJSON(brief);
+#endif
 	
 	if (!this->isDoubleBuffered) {
 		return !0;
@@ -109,10 +117,33 @@ bool HGEGate::produceJSON(JSONValue& json, bool purify) {
 }
 
 bool HGEGate::reportJSON(JSONValue& result) {
-	JSONValue brief;
-	this->openJSON(brief);
-	this->getSuperior()->markJSON(result, brief, 0);
-	return !0;
+	
+	bool willReport = 0;
+	
+	if (this->reporter.IsUndefined()) {
+		this->openJSON(this->reporter);
+		HGEAssertC(this->reporter.IsArray(), "reporter must be an array...");
+		this->rter = this->reporter.Begin();
+	}
+	
+	HGEAssertC(this->reporter.IsArray(), "reporter must be an array");
+	
+	if ( ( willReport = !( this->rter == this->reporter.End() ) ) ) {
+		result = (**this->rter);
+		willReport = !( ++this->rter == this->reporter.End() );
+	}
+	
+	if (willReport) {
+		return !0;
+	}
+	
+	this->reporter.SetUndefined();
+	return 0;
+	
+	//JSONValue brief;
+	//this->openJSON(brief);
+	//this->getSuperior()->markJSON(result, brief, 0);
+	//return !0;
 }
 
 bool HGEGate::openJSON(JSONValue& result) {

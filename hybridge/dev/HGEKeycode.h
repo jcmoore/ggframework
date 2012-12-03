@@ -25,6 +25,8 @@
 #define HGE_KEYTEXT_SERVICE_GATE				"#"
 #define HGE_KEYTEXT_SERVICE_LOGGER				"<<"
 #define HGE_KEYTEXT_SERVICE_DISH				">>"
+#define HGE_KEYTEXT_SERVICE_CLOCK				"Q"
+#define HGE_KEYTEXT_SERVICE_ENTROPY				"?"
 #define HGE_KEYTEXT_SERVICE_ROUTER				"@"
 
 #endif

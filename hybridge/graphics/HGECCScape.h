@@ -13,7 +13,10 @@
 
 NS_HGE_BEGIN
 
-class HGECCScape : public HGECCNexus {
+class HGECCScape : public
+HGECCNexus {
+	
+	typedef HGECCNexus Parent;
 	
 public:
 	
@@ -24,7 +27,7 @@ public:
 			}
 			return !0;
 		} else {
-			return this->HGECCNexus::areYou(concrete, result);
+			return this->Parent::areYou(concrete, result);
 		}
 	}
 	
@@ -32,7 +35,7 @@ protected:
 	
 	virtual bool beKind (MagicChip::Condition condition, MagicChip::MagicDerived ** result) {
 		if (kind_hge(condition) == HGE_KINDOF( HGECCScape ) ||
-			HGECCNexus::beKind(condition, result)) {
+			this->Parent::beKind(condition, result)) {
 			if (result) {
 				*result = this;
 			}

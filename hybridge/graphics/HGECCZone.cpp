@@ -76,7 +76,8 @@ public:
 			
 			CCPoint locationNow = touch->getLocation();
 			
-			timeSD_hge previousTime = this->timeForTouch(touch->getID(), currentTime);
+			timeSD_hge startTime = this->startTimeForTouch(touch->getID(), currentTime);
+			timeSD_hge lastTime = this->updateTimeForTouch(touch->getID(), currentTime);
 			
 			JSONValue value(vapidjson::kObjectType);
 			
@@ -85,9 +86,10 @@ public:
 			value.AddMember("t", currentTime);
 			value.AddMember("x", (int)(locationNow.x));
 			value.AddMember("y", (int)(locationNow.y));
-			value.AddMember("tt", currentTime - previousTime);
+			value.AddMember("tt", currentTime - lastTime);
 			value.AddMember("xx", (int)(0));
 			value.AddMember("yy", (int)(0));
+			value.AddMember("a", currentTime - startTime);
 			
 			list.PushBack(value);
 			
@@ -125,7 +127,8 @@ public:
 			CCPoint locationNow = touch->getLocation();
 			CCPoint locationThen = touch->getPreviousLocation();
 			
-			timeSD_hge previousTime = this->timeForTouch(touch->getID(), currentTime);
+			timeSD_hge startTime = this->startTimeForTouch(touch->getID(), currentTime);
+			timeSD_hge lastTime = this->updateTimeForTouch(touch->getID(), currentTime);
 			
 			JSONValue value(vapidjson::kObjectType);
 			
@@ -134,9 +137,10 @@ public:
 			value.AddMember("t", currentTime);
 			value.AddMember("x", (int)(locationNow.x));
 			value.AddMember("y", (int)(locationNow.y));
-			value.AddMember("tt", currentTime - previousTime);
+			value.AddMember("tt", currentTime - lastTime);
 			value.AddMember("xx", (int)(locationNow.x - locationThen.x));
 			value.AddMember("yy", (int)(locationNow.y - locationThen.y));
+			value.AddMember("a", currentTime - startTime);
 			
 #if NATIVE_ONLY
 			CCPoint locationMy = this->getPosition();
@@ -180,7 +184,8 @@ public:
 			CCPoint locationNow = touch->getLocation();
 			CCPoint locationThen = touch->getPreviousLocation();
 			
-			timeSD_hge previousTime = this->timeForTouch(touch->getID(), currentTime);
+			timeSD_hge startTime = this->startTimeForTouch(touch->getID(), currentTime);
+			timeSD_hge lastTime = this->updateTimeForTouch(touch->getID(), currentTime);
 			
 			JSONValue value(vapidjson::kObjectType);
 			
@@ -189,13 +194,16 @@ public:
 			value.AddMember("t", currentTime);
 			value.AddMember("x", (int)(locationNow.x));
 			value.AddMember("y", (int)(locationNow.y));
-			value.AddMember("tt", currentTime - previousTime);
+			value.AddMember("tt", currentTime - lastTime);
 			value.AddMember("xx", (int)(locationNow.x - locationThen.x));
 			value.AddMember("yy", (int)(locationNow.y - locationThen.y));
+			value.AddMember("a", currentTime - startTime);
 			
 			list.PushBack(value);
 			
 			count++;
+			
+			this->zeroTimeForTouch(touch->getID());
 		}
 		
 		JSONValue message(vapidjson::kObjectType);
@@ -229,7 +237,8 @@ public:
 			CCPoint locationNow = touch->getLocation();
 			CCPoint locationThen = touch->getPreviousLocation();
 			
-			timeSD_hge previousTime = this->timeForTouch(touch->getID(), currentTime);
+			timeSD_hge startTime = this->startTimeForTouch(touch->getID(), currentTime);
+			timeSD_hge lastTime = this->updateTimeForTouch(touch->getID(), currentTime);
 			
 			JSONValue value(vapidjson::kObjectType);
 			
@@ -238,13 +247,16 @@ public:
 			value.AddMember("t", currentTime);
 			value.AddMember("x", (int)(locationNow.x));
 			value.AddMember("y", (int)(locationNow.y));
-			value.AddMember("tt", currentTime - previousTime);
+			value.AddMember("tt", currentTime - lastTime);
 			value.AddMember("xx", (int)(locationNow.x - locationThen.x));
 			value.AddMember("yy", (int)(locationNow.y - locationThen.y));
+			value.AddMember("l", currentTime - startTime);
 			
 			list.PushBack(value);
 			
 			count++;
+			
+			this->zeroTimeForTouch(touch->getID());
 		}
 		
 		JSONValue message(vapidjson::kObjectType);
@@ -255,16 +267,33 @@ public:
 		this->passInput(message, 0);
 	}
 	
-	timeSD_hge timeForTouch(int id, timeSD_hge fallback) {
+	timeSD_hge startTimeForTouch(int id, timeSD_hge fallback) {
 		
-		PrimitiveTime * t = (PrimitiveTime *)this->inputTimes.objectForKey(id);
+		PrimitiveTime * t = (PrimitiveTime *)this->startTimes.objectForKey(id);
 		
 		if (t) {
 			return t->getValue();
 		}
 		
 		t = new PrimitiveTime(fallback);
-		this->inputTimes.setObject(t, id);
+		this->startTimes.setObject(t, id);
+		t->release();
+		
+		return t->getValue();
+	}
+	
+	timeSD_hge updateTimeForTouch(int id, timeSD_hge current) {
+		
+		PrimitiveTime * t = (PrimitiveTime *)this->lastTimes.objectForKey(id);
+		
+		if (t) {
+			timeSD_hge last = t->getValue();
+			t->setValue(current);
+			return last;
+		}
+		
+		t = new PrimitiveTime(current);
+		this->startTimes.setObject(t, id);
 		t->release();
 		
 		return t->getValue();
@@ -272,20 +301,23 @@ public:
 	
 	void zeroTimeForTouch(int id) {
 		
-		PrimitiveTime * t = (PrimitiveTime *)this->inputTimes.objectForKey(id);
+		updateTimeForTouch(id, 0);
+		
+		PrimitiveTime * t = (PrimitiveTime *)this->startTimes.objectForKey(id);
 		
 		if (t) {
 			t->setValue(0);
 		}
 		
 		t = new PrimitiveTime(0);
-		this->inputTimes.setObject(t, id);
+		this->startTimes.setObject(t, id);
 		t->release();
 	}
 	
 	HGECanJott<>::Magic * jotter;
 	
-	CCDictionary inputTimes;
+	CCDictionary startTimes;
+	CCDictionary lastTimes;
 };
 
 bool HGECCZone::destroyJSON(JSONValue& json, bool firstResponder)

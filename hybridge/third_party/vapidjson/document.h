@@ -448,13 +448,19 @@ int z = a[0u].GetInt();				// This works too.
 	}
 	
 	//! Remove the last element in the array.
-	GenericValue& PopFront() {
+	GenericValue& PopFront(GenericValue * result = 0) {
 		VAPIDJSON_ASSERT(IsArray());
 		VAPIDJSON_ASSERT(!Empty());
 		if (!data_.a.elements) {
-			return UndefinedValue();
+			if (result) {
+				result->SetUndefined();
+			}
+			return *this;
 		}
 		GenericValue * e = data_.a.elements->front();
+		if (result) {
+			(*result) = (*e);
+		}
 		delete e;
 		data_.a.elements->pop_front();
 		data_.a.size--;
@@ -488,13 +494,19 @@ int z = a[0u].GetInt();				// This works too.
 	}
 	
 	//! Remove the last element in the array.
-	GenericValue& PopBack() {
+	GenericValue& PopBack(GenericValue * result = 0) {
 		VAPIDJSON_ASSERT(IsArray());
 		VAPIDJSON_ASSERT(!Empty());
 		if (!data_.a.elements) {
-			return UndefinedValue();
+			if (result) {
+				result->SetUndefined();
+			}
+			return *this;
 		}
 		GenericValue * e = data_.a.elements->back();
+		if (result) {
+			(*result) = (*e);
+		}
 		delete e;
 		data_.a.elements->pop_back();
 		data_.a.size--;
