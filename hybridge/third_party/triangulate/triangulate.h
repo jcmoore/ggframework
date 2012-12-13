@@ -45,6 +45,14 @@ public:
 	{
 		Set(x,y);
 	};
+	Vector2d() : mX(0), mY(0) {};
+    Vector2d(const Vector2d & v) : mX(v.mX), mY(v.mY) {};
+	
+	Vector2d& operator =(Vector2d const& v) {
+		this->mX = v.mX;
+		this->mY = v.mY;
+		return *this;
+	}
 	
 	float GetX(void) const { return mX; };
 	

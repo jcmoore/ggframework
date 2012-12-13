@@ -86,9 +86,12 @@ public:
 			value.AddMember("t", currentTime);
 			value.AddMember("x", (int)(locationNow.x));
 			value.AddMember("y", (int)(locationNow.y));
-			value.AddMember("tt", currentTime - lastTime);
-			value.AddMember("xx", (int)(0));
-			value.AddMember("yy", (int)(0));
+			value.AddMember("tt", lastTime);
+			value.AddMember("xx", (int)(locationNow.x));
+			value.AddMember("yy", (int)(locationNow.y));
+			value.AddMember("dt", currentTime - lastTime);
+			value.AddMember("dx", (int)(0));
+			value.AddMember("dy", (int)(0));
 			value.AddMember("a", currentTime - startTime);
 			
 			list.PushBack(value);
@@ -137,9 +140,12 @@ public:
 			value.AddMember("t", currentTime);
 			value.AddMember("x", (int)(locationNow.x));
 			value.AddMember("y", (int)(locationNow.y));
-			value.AddMember("tt", currentTime - lastTime);
-			value.AddMember("xx", (int)(locationNow.x - locationThen.x));
-			value.AddMember("yy", (int)(locationNow.y - locationThen.y));
+			value.AddMember("tt", lastTime);
+			value.AddMember("xx", (int)(locationThen.x));
+			value.AddMember("yy", (int)(locationThen.y));
+			value.AddMember("dt", currentTime - lastTime);
+			value.AddMember("dx", (int)(locationNow.x - locationThen.x));
+			value.AddMember("dy", (int)(locationNow.y - locationThen.y));
 			value.AddMember("a", currentTime - startTime);
 			
 #if NATIVE_ONLY
@@ -194,9 +200,12 @@ public:
 			value.AddMember("t", currentTime);
 			value.AddMember("x", (int)(locationNow.x));
 			value.AddMember("y", (int)(locationNow.y));
-			value.AddMember("tt", currentTime - lastTime);
-			value.AddMember("xx", (int)(locationNow.x - locationThen.x));
-			value.AddMember("yy", (int)(locationNow.y - locationThen.y));
+			value.AddMember("tt", lastTime);
+			value.AddMember("xx", (int)(locationThen.x));
+			value.AddMember("yy", (int)(locationThen.y));
+			value.AddMember("dt", currentTime - lastTime);
+			value.AddMember("dx", (int)(locationNow.x - locationThen.x));
+			value.AddMember("dy", (int)(locationNow.y - locationThen.y));
 			value.AddMember("a", currentTime - startTime);
 			
 			list.PushBack(value);
@@ -247,9 +256,12 @@ public:
 			value.AddMember("t", currentTime);
 			value.AddMember("x", (int)(locationNow.x));
 			value.AddMember("y", (int)(locationNow.y));
-			value.AddMember("tt", currentTime - lastTime);
-			value.AddMember("xx", (int)(locationNow.x - locationThen.x));
-			value.AddMember("yy", (int)(locationNow.y - locationThen.y));
+			value.AddMember("tt", lastTime);
+			value.AddMember("xx", (int)(locationThen.x));
+			value.AddMember("yy", (int)(locationThen.y));
+			value.AddMember("dt", currentTime - lastTime);
+			value.AddMember("dx", (int)(locationNow.x - locationThen.x));
+			value.AddMember("dy", (int)(locationNow.y - locationThen.y));
 			value.AddMember("l", currentTime - startTime);
 			
 			list.PushBack(value);

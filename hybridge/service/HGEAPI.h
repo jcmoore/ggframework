@@ -14,6 +14,7 @@
 #include <string>
 
 #include "service/HGEWorker.h"
+#include "service/HGEMemoizer.h"
 
 NS_HGE_BEGIN
 
@@ -54,9 +55,10 @@ protected:
 
 class HGEAPIWorker : public HGEAPI {
 public:
-	HGEAPIWorker(void * c, HGEWorker * worker)
+	HGEAPIWorker(void * c, HGEWorker * worker, HGEMemoizer * memoizer = 0)
 	: HGEAPI(c)
 	, chief(worker)
+	, scribe(memoizer)
 	, capacity(0)
 	, buffer(0) {}
 	
@@ -85,6 +87,7 @@ public:
 protected:
 	
 	HGEWorker * chief;
+	HGEMemoizer * scribe;
 	size_t capacity;
 	char * buffer;
 };

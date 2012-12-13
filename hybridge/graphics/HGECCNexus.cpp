@@ -150,7 +150,7 @@ bool HGECCNexus::addLeaf(JSONValue const& json, bool implicit)
 	}
 	
 	pointer = &json["ele"];
-	depth_nexus ele = pointer->IsNumber() ? pointer->GetInt64() : this->ccelevation;
+	depth_nexus ele = pointer->IsNumber() ? pointer->GetInt64() : 0;
 	
 	pointer = &json["code"];
 	key_nexus code = pointer->IsNumber() ? pointer->GetInt64() : 0;

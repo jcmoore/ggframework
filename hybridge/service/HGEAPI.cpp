@@ -23,9 +23,17 @@ void HGEAPIWorker::flushMessage(JSONBuffer& stream) {
 	JSONWriter output(stream);
 	
 	json.Accept(output);
+	
+	if (this->scribe) {
+		this->scribe->istream(stream.GetString());
+	}
 }
 
 void HGEAPIWorker::handleMessage(const char * data, size_t length) {
+	
+	if (this->scribe) {
+		this->scribe->ostream(data);
+	}
 	
 	JSONDoc doc;
 	

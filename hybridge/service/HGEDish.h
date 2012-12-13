@@ -13,10 +13,6 @@
 
 NS_HGE_BEGIN
 
-/**
- worker in charge of handling arbitrary log messages
- from the serializing application in the web environment
- */
 class HGEDish : public HGEWorker {
 	
 public:

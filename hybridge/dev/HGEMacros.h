@@ -33,9 +33,10 @@
 typedef signed char bool_hge;
 
 #define HGEPrintln                          HGEPrint("\n");  HGEPrint
-#define HGEPrint                            printf
+#define HGEPrint							printf
 //#define HGEPrint                            hge_not_print
-#define HGEVPrint                           vprintf
+
+#define HGEVPrint							vprintf
 
 static inline void hge_not_print(const char * format, ...) {}
 
